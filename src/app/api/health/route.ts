@@ -13,14 +13,21 @@ import {
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  const supabaseUrl = optionalEnv("NEXT_PUBLIC_SUPABASE_URL");
+  // Extract just the project ref (e.g. "omdxaqmyjkrwpucpgftj" from
+  // "https://omdxaqmyjkrwpucpgftj.supabase.co"). Safe to expose — it's in
+  // every API call and inside every issued JWT.
+  const projectRef = supabaseUrl?.match(/https:\/\/([^.]+)\.supabase\.co/)?.[1] ?? null;
+
   return jsonOk({
     nodeEnv: process.env.NODE_ENV,
     cwd: process.cwd(),
     supabase: {
-      url: !!optionalEnv("NEXT_PUBLIC_SUPABASE_URL"),
+      url: !!supabaseUrl,
       anonKey: !!optionalEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
       serviceRole: !!optionalEnv("SUPABASE_SERVICE_ROLE_KEY"),
       configured: isSupabaseConfigured(),
+      projectRef,
     },
     stripe: {
       secret: !!optionalEnv("STRIPE_SECRET_KEY"),
