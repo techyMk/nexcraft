@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(curl -s -o /dev/null -w \"GET / on 3001 -> %{http_code}\\\\n\" http://localhost:3001/)",
+      "Bash(curl -s -o /dev/null -w \"GET /shop on 3001 -> %{http_code}\\\\n\" http://localhost:3001/shop)",
+      "Bash(curl -s -o /dev/null -w \"GET /admin on 3001 -> %{http_code}\\\\n\" http://localhost:3001/admin)",
+      "Bash(curl -s -o /dev/null -w \"GET /product/iphone-15-pro-max -> %{http_code}\\\\n\" http://localhost:3001/product/iphone-15-pro-max)",
+      "Bash(curl -s -o /dev/null -w \"GET /checkout -> %{http_code}\\\\n\" http://localhost:3001/checkout)",
+      "Bash(curl -s -o /dev/null -w \"GET /login -> %{http_code}\\\\n\" http://localhost:3001/login)",
+      "Bash(curl -s -o /dev/null -w \"GET /register -> %{http_code}\\\\n\" http://localhost:3001/register)",
+      "Bash(pkill -f \"next-server\")",
+      "Bash(node scripts/convert-logos.mjs)",
+      "Bash(node scripts/build-favicon.mjs)",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' http://localhost:3003__TRACKED_VAR__)",
+      "Bash(pkill -f \"next dev\")"
+    ]
+  }
+}

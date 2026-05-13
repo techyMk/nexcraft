@@ -1,0 +1,174 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --bg: #050816;
+  --surface: #0b1120;
+  --surface-2: #111827;
+  --text: #f8fafc;
+  --text-2: #94a3b8;
+  --border: rgba(255, 255, 255, 0.08);
+  --primary: #5b8cff;
+  --accent: #3b82f6;
+  --accent-2: #7c3aed;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body {
+  background: #050816;
+  color: var(--text);
+  font-family: var(--font-inter), Inter, system-ui, sans-serif;
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(1200px 700px at 80% -10%, rgba(124, 58, 237, 0.18), transparent 60%),
+    radial-gradient(1100px 700px at -10% 10%, rgba(59, 130, 246, 0.18), transparent 60%),
+    #050816;
+}
+
+/* Selection */
+::selection {
+  background: rgba(91, 140, 255, 0.35);
+  color: #fff;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0b1120;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #3b82f6, #7c3aed);
+  border-radius: 999px;
+}
+
+@layer components {
+  .glass {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.04) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    );
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .glass-strong {
+    background: rgba(11, 17, 32, 0.7);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, #fff 0%, #c7d3ff 50%, #b388ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .text-gradient-brand {
+    background: linear-gradient(135deg, #3b82f6 0%, #5b8cff 35%, #7c3aed 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-all;
+  }
+
+  .btn-primary {
+    @apply text-white shadow-glow;
+    background: linear-gradient(135deg, #3b82f6 0%, #5b8cff 50%, #7c3aed 100%);
+    background-size: 200% 200%;
+    transition: background-position 0.6s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  }
+  .btn-primary:hover {
+    background-position: 100% 50%;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 40px -10px rgba(91, 140, 255, 0.7);
+  }
+
+  .btn-ghost {
+    @apply text-text;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium;
+    background: rgba(91, 140, 255, 0.12);
+    color: #c7d3ff;
+    border: 1px solid rgba(91, 140, 255, 0.25);
+  }
+
+  .card {
+    @apply rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-xl;
+  }
+
+  .hairline {
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+
+  .section {
+    @apply py-20 md:py-28 relative;
+  }
+
+  .section-title {
+    @apply font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight;
+  }
+
+  .section-eyebrow {
+    @apply text-xs uppercase tracking-[0.2em] text-primary-400;
+  }
+}
+
+@layer utilities {
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 0%, transparent 70%);
+  }
+
+  .noise {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.04 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  .glow-blue {
+    box-shadow: 0 0 80px -10px rgba(59, 130, 246, 0.4);
+  }
+  .glow-purple {
+    box-shadow: 0 0 80px -10px rgba(124, 58, 237, 0.4);
+  }
+
+  .mask-fade-b {
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+}
