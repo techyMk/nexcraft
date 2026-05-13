@@ -121,6 +121,33 @@ You should see:
    - Enable Email + Password (default)
    - For prod, set up SMTP via Resend (Authentication → Emails)
 
+4. **Authentication → Email Templates → Confirm signup** *(required for the OTP flow)*
+
+   The default template only includes a confirmation link. NexCart's
+   `/register` page asks the user for a **6-digit code** instead, which
+   lives in the template variable `{{ .Token }}`. Replace the template
+   body with:
+
+   ```html
+   <h2>Welcome to NexCart 👋</h2>
+   <p>Your verification code is:</p>
+   <p style="font-size:32px;letter-spacing:8px;font-weight:700;font-family:monospace;">
+     {{ .Token }}
+   </p>
+   <p>This code expires in 1 hour.</p>
+   <p style="color:#666;font-size:12px;">
+     Or click here to verify in the browser:
+     <a href="{{ .ConfirmationURL }}">Verify email</a>
+   </p>
+   ```
+
+   Both paths work — the user can type the code OR click the link
+   (link routes through `/auth/callback`).
+
+   **Subject line:** `Your NexCart verification code`
+
+   Click **Save** at the bottom.
+
 ---
 
 ## 4. Create `.env.local`

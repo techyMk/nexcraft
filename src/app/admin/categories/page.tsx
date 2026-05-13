@@ -2,6 +2,7 @@
 
 import { Pencil, Plus, Search, Tag, Trash2 } from "lucide-react";
 import { categories, products } from "@/lib/data";
+import { CategoryIcon } from "@/lib/icons";
 
 export default function AdminCategories() {
   return (
@@ -44,8 +45,8 @@ export default function AdminCategories() {
             >
               <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-primary-500/15 blur-3xl opacity-0 transition group-hover:opacity-100" />
               <div className="flex items-start justify-between">
-                <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-brand text-2xl shadow-glow">
-                  {c.icon}
+                <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-brand text-white shadow-glow">
+                  <CategoryIcon slug={c.slug} size={22} />
                 </div>
                 <div className="flex gap-1">
                   <button

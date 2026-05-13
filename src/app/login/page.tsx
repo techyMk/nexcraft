@@ -3,10 +3,21 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { AlertTriangle, Eye, EyeOff, Sparkles } from "lucide-react";
-import { useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import {
+  AlertTriangle,
+  ArrowRight,
+  CheckCircle2,
+  Eye,
+  EyeOff,
+  Loader2,
+  LogOut,
+  Sparkles,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function LoginPage() {
   return (
@@ -17,12 +28,95 @@ export default function LoginPage() {
 }
 
 function LoginInner() {
-  const [show, setShow] = useState(false);
-  const [loading, setLoading] = useState<"google" | null>(null);
-  const [err, setErr] = useState<string | null>(null);
+  const router = useRouter();
   const search = useSearchParams();
   const next = search?.get("next") ?? "/account";
   const queryError = search?.get("error");
+
+  // Auth state of the visitor
+  const [meEmail, setMeEmail] = useState<string | null>(null);
+  const [checking, setChecking] = useState(true);
+
+  // Form state
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPwd, setShowPwd] = useState(false);
+  const [emailErr, setEmailErr] = useState<string | null>(null);
+  const [pwdErr, setPwdErr] = useState<string | null>(null);
+  const [loading, setLoading] = useState<"email" | "google" | "signout" | null>(
+    null,
+  );
+  const [err, setErr] = useState<string | null>(queryError ?? null);
+
+  // Check existing session
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const supabase = createClient();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!cancelled) setMeEmail(user?.email ?? null);
+      } catch {
+        /* env missing — fall through to form */
+      } finally {
+        if (!cancelled) setChecking(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  function validateEmail(value: string) {
+    if (!value.trim()) return "Email is required.";
+    if (!EMAIL_RE.test(value)) return "That doesn't look like a valid email.";
+    return null;
+  }
+
+  async function onEmailSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const eErr = validateEmail(email);
+    const pErr = password.length === 0 ? "Enter your password." : null;
+    setEmailErr(eErr);
+    setPwdErr(pErr);
+    if (eErr || pErr) return;
+
+    setErr(null);
+    setLoading("email");
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+      if (error) {
+        const msg = error.message.toLowerCase();
+        if (msg.includes("invalid login credentials")) {
+          setErr(
+            "We couldn't find an account with that email and password. Did you mean to sign up first?",
+          );
+        } else if (msg.includes("email not confirmed")) {
+          setErr(
+            "Your email isn't verified yet. Check your inbox for the 6-digit code or the verification link.",
+          );
+        } else {
+          setErr(error.message);
+        }
+        // Clear password on failure, keep email so they can retry
+        setPassword("");
+        setLoading(null);
+        return;
+      }
+      router.refresh();
+      router.push(next);
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Sign-in failed");
+      setPassword("");
+      setLoading(null);
+    }
+  }
 
   async function onGoogle() {
     setErr(null);
@@ -39,12 +133,100 @@ function LoginInner() {
         setErr(error.message);
         setLoading(null);
       }
-      // success → browser is redirecting, keep the spinner state
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Sign-in failed");
       setLoading(null);
     }
   }
+
+  async function onSignOut() {
+    setLoading("signout");
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+      setMeEmail(null);
+      router.refresh();
+    } finally {
+      setLoading(null);
+    }
+  }
+
+  // ── States ────────────────────────────────────────────────────────────
+
+  if (checking) {
+    return (
+      <div className="grid min-h-[60vh] place-items-center pt-24">
+        <Loader2 size={20} className="animate-spin text-text-2" />
+      </div>
+    );
+  }
+
+  // Already signed in — show a friendly switcher
+  if (meEmail) {
+    return (
+      <div className="grid min-h-screen place-items-center pt-24">
+        <div className="container max-w-md">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-bg/60 p-8 backdrop-blur-2xl"
+          >
+            <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-emerald-500/20 blur-3xl" />
+            <div className="relative">
+              <Link href="/" aria-label="NexCart home" className="inline-flex">
+                <Image
+                  src="/brand/nexcart-logo.webp"
+                  alt="NexCart"
+                  width={1200}
+                  height={600}
+                  priority
+                  className="h-16 w-auto"
+                />
+              </Link>
+              <div className="mt-6 flex items-start gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm">
+                <CheckCircle2
+                  size={18}
+                  className="mt-0.5 shrink-0 text-emerald-300"
+                />
+                <div>
+                  <div className="font-semibold text-emerald-100">
+                    You&apos;re already signed in
+                  </div>
+                  <div className="text-emerald-200/80">as {meEmail}</div>
+                </div>
+              </div>
+              <h1 className="mt-6 font-display text-2xl font-semibold tracking-tight">
+                No need to sign in again.
+              </h1>
+              <p className="mt-1 text-sm text-text-2">
+                Want to continue, or switch to a different account?
+              </p>
+              <div className="mt-6 flex flex-col gap-2">
+                <Link href={next} className="btn btn-primary w-full">
+                  <ArrowRight size={14} /> Continue
+                </Link>
+                <button
+                  onClick={onSignOut}
+                  disabled={loading === "signout"}
+                  className="btn btn-ghost w-full disabled:opacity-60"
+                >
+                  {loading === "signout" ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <LogOut size={14} />
+                  )}
+                  {loading === "signout" ? "Signing out…" : "Sign out"}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
+  // Default: sign-in form
   return (
     <div className="grid min-h-screen place-items-center pt-24">
       <div className="container max-w-md">
@@ -74,10 +256,13 @@ function LoginInner() {
               Sign in to continue your intelligent shopping journey.
             </p>
 
-            {(err || queryError) && (
-              <div className="mt-6 flex items-start gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-200">
+            {err && (
+              <div
+                role="alert"
+                className="mt-6 flex items-start gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-200"
+              >
                 <AlertTriangle size={14} className="mt-0.5 shrink-0" />
-                <span>{err ?? queryError}</span>
+                <span>{err}</span>
               </div>
             )}
 
@@ -89,7 +274,7 @@ function LoginInner() {
                 className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading === "google" ? (
-                  <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  <Loader2 size={14} className="animate-spin" />
                 ) : (
                   <GoogleIcon />
                 )}
@@ -102,20 +287,40 @@ function LoginInner() {
               <span className="h-px flex-1 bg-white/[0.06]" />
             </div>
 
-            <form className="space-y-3">
-              <Field label="Email" type="email" placeholder="you@email.com" />
+            <form onSubmit={onEmailSubmit} className="space-y-3" noValidate>
+              <Field
+                label="Email"
+                type="email"
+                autoComplete="email"
+                placeholder="you@email.com"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (emailErr) setEmailErr(null);
+                }}
+                onBlur={() => setEmailErr(validateEmail(email))}
+                error={emailErr}
+              />
               <div className="relative">
                 <Field
                   label="Password"
-                  type={show ? "text" : "password"}
+                  type={showPwd ? "text" : "password"}
+                  autoComplete="current-password"
                   placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (pwdErr) setPwdErr(null);
+                  }}
+                  error={pwdErr}
                 />
                 <button
                   type="button"
-                  onClick={() => setShow((v) => !v)}
+                  onClick={() => setShowPwd((v) => !v)}
                   className="absolute right-3 top-9 text-text-2 hover:text-white"
+                  aria-label={showPwd ? "Hide password" : "Show password"}
                 >
-                  {show ? <EyeOff size={15} /> : <Eye size={15} />}
+                  {showPwd ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
               <div className="flex items-center justify-between text-xs">
@@ -131,8 +336,17 @@ function LoginInner() {
                   Forgot password?
                 </a>
               </div>
-              <button type="button" className="btn btn-primary w-full">
-                <Sparkles size={14} /> Sign in
+              <button
+                type="submit"
+                disabled={loading === "email"}
+                className="btn btn-primary w-full disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {loading === "email" ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : (
+                  <Sparkles size={14} />
+                )}
+                {loading === "email" ? "Signing in…" : "Sign in"}
               </button>
             </form>
             <p className="mt-5 text-center text-sm text-text-2">
@@ -150,8 +364,12 @@ function LoginInner() {
 
 function Field({
   label,
+  error,
   ...rest
-}: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) {
+}: React.InputHTMLAttributes<HTMLInputElement> & {
+  label: string;
+  error?: string | null;
+}) {
   return (
     <label className="block">
       <span className="mb-1.5 block text-xs uppercase tracking-widest text-text-2">
@@ -159,8 +377,16 @@ function Field({
       </span>
       <input
         {...rest}
-        className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 text-sm outline-none focus:border-primary-400/60 focus:ring-2 focus:ring-primary-400/20"
+        aria-invalid={!!error}
+        className={`w-full rounded-xl border ${
+          error ? "border-rose-500/50" : "border-white/[0.08]"
+        } bg-white/[0.03] px-3 py-2.5 text-sm outline-none focus:border-primary-400/60 focus:ring-2 focus:ring-primary-400/20`}
       />
+      {error && (
+        <span className="mt-1 inline-flex items-center gap-1 text-xs text-rose-300">
+          <AlertTriangle size={11} /> {error}
+        </span>
+      )}
     </label>
   );
 }
@@ -175,4 +401,3 @@ function GoogleIcon() {
     </svg>
   );
 }
-

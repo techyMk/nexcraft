@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { categories } from "@/lib/data";
+import { CategoryIcon } from "@/lib/icons";
 
 export function CategoriesSection() {
   return (
@@ -81,8 +82,10 @@ function CategoryCard({
         </div>
         <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-5">
           <div>
-            <div className="text-2xl">{cat.icon}</div>
-            <div className="mt-2 font-display text-xl font-semibold tracking-tight">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.08] text-primary-300 ring-1 ring-white/10 backdrop-blur">
+              <CategoryIcon slug={cat.slug} size={18} />
+            </span>
+            <div className="mt-3 font-display text-xl font-semibold tracking-tight">
               {cat.name}
             </div>
             <div className="text-xs text-text-2">{cat.count} products</div>
