@@ -139,6 +139,70 @@ git add README.md docs/SETUP.md docs/INTEGRATION.md docs/COMMITS.md \
 git commit -m "docs: setup, integration map, commit sequence"
 ```
 
+## 14 · Go-Live playbook
+
+```bash
+git add docs/GO-LIVE.md
+git commit -m "docs: GO-LIVE.md — 8-phase playbook from git push to live"
+```
+
+## 15 · Google OAuth on login + register
+
+```bash
+git add src/app/login/page.tsx src/app/register/page.tsx
+git commit -m "feat(auth): wire Google sign-in handlers and drop Apple placeholder"
+```
+
+## 16 · /api/health diagnostic endpoint
+
+```bash
+git add src/app/api/health/route.ts
+git commit -m "feat(api): /api/health diagnostic — reports env wiring without leaking values"
+```
+
+## 17 · Fix: NEXT_PUBLIC_* not reaching the browser bundle
+
+```bash
+git add src/lib/supabase/client.ts src/lib/env.ts
+git commit -m "$(cat <<'EOF'
+fix(env): read NEXT_PUBLIC_* statically in the browser client
+
+requireEnv(name) uses dynamic process.env[name] access, which webpack
+can't inline into the browser bundle (only literal property accesses
+get replaced). Server code is unaffected; only src/lib/supabase/client.ts
+was hit — symptom was "NEXT_PUBLIC_SUPABASE_URL is not set" even though
+the server-side /api/health reported all vars present.
+
+Added a header note to src/lib/env.ts so requireEnv stays server-only.
+EOF
+)"
+```
+
+## 18 · Account page reads from Supabase + working sign-out
+
+```bash
+git add src/app/account/page.tsx src/app/account/account-view.tsx \
+        next.config.mjs
+git commit -m "feat(account): server-render real profile + orders, working sign-out"
+```
+
+## 19 · Scroll progress bar replaces native scrollbar
+
+```bash
+git add src/components/scroll-progress.tsx src/app/layout.tsx \
+        src/app/globals.css
+git commit -m "feat(ui): scroll progress bar under navbar; hide native page scrollbar"
+```
+
+## 20 · Edit profile modal + server action
+
+```bash
+git add src/app/account/actions.ts \
+        src/app/account/edit-profile-modal.tsx \
+        src/app/account/account-view.tsx
+git commit -m "feat(account): edit profile modal with updateProfile server action"
+```
+
 ---
 
 ## After all commits — first run

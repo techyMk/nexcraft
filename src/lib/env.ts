@@ -1,10 +1,18 @@
 /**
- * Env validation helpers.
+ * Env validation helpers — **server-side only**.
  *
- * Use `requireEnv("STRIPE_SECRET_KEY")` inside API routes / server actions —
- * if the variable is missing the request fails with a *useful* JSON error
- * ("STRIPE_SECRET_KEY is not set on the server") instead of a cryptic
- * "Cannot read properties of undefined" stack trace.
+ * ⚠️ Do NOT call these from `"use client"` modules. Both use dynamic
+ * `process.env[name]` access, which webpack/Next.js cannot inline into the
+ * browser bundle (only literal `process.env.NEXT_PUBLIC_X` accesses get
+ * replaced). In the browser they always return `undefined`.
+ *
+ * For client-side env needs, read `process.env.NEXT_PUBLIC_*` directly —
+ * see `src/lib/supabase/client.ts` for the pattern.
+ *
+ * Use `requireEnv("STRIPE_SECRET_KEY")` inside API routes / server actions /
+ * server components — if the variable is missing, the request fails with a
+ * useful JSON error ("STRIPE_SECRET_KEY is not set on the server") instead
+ * of a cryptic "Cannot read properties of undefined" stack trace.
  */
 
 export class EnvError extends Error {

@@ -3,9 +3,35 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Sparkles, ShieldCheck, Zap, Brain } from "lucide-react";
+import { AlertTriangle, Brain, ShieldCheck, Sparkles, Zap } from "lucide-react";
+import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function RegisterPage() {
+  const [loading, setLoading] = useState<"google" | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+
+  async function onGoogle() {
+    setErr(null);
+    setLoading("google");
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?next=/account`,
+        },
+      });
+      if (error) {
+        setErr(error.message);
+        setLoading(null);
+      }
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Sign-up failed");
+      setLoading(null);
+    }
+  }
+
   return (
     <div className="grid min-h-screen place-items-center pt-24">
       <div className="container">
@@ -100,14 +126,25 @@ export default function RegisterPage() {
                 <span className="h-px flex-1 bg-white/[0.06]" /> or sign up with
                 <span className="h-px flex-1 bg-white/[0.06]" />
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                <button className="rounded-full border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm hover:bg-white/[0.06]">
-                  Google
-                </button>
-                <button className="rounded-full border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm hover:bg-white/[0.06]">
-                  Apple
-                </button>
-              </div>
+              {err && (
+                <div className="mb-4 flex items-start gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-200">
+                  <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+                  <span>{err}</span>
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={onGoogle}
+                disabled={loading === "google"}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {loading === "google" ? (
+                  <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                ) : (
+                  <GoogleIcon />
+                )}
+                {loading === "google" ? "Redirecting…" : "Continue with Google"}
+              </button>
             </div>
           </motion.div>
         </div>
@@ -130,5 +167,16 @@ function Field({
         className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 text-sm outline-none focus:border-primary-400/60 focus:ring-2 focus:ring-primary-400/20"
       />
     </label>
+  );
+}
+
+function GoogleIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden>
+      <path
+        fill="#fff"
+        d="M21.35 11.1H12v3.2h5.35c-.24 1.4-1.74 4.1-5.35 4.1-3.22 0-5.85-2.66-5.85-5.95s2.63-5.95 5.85-5.95c1.83 0 3.06.78 3.76 1.45l2.57-2.47C16.84 3.94 14.66 3 12 3 6.92 3 2.85 7.06 2.85 12s4.07 9 9.15 9c5.27 0 8.78-3.7 8.78-8.92 0-.6-.07-1.06-.16-1.48z"
+      />
+    </svg>
   );
 }

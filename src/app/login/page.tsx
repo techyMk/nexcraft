@@ -3,11 +3,48 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Sparkles, Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { AlertTriangle, Eye, EyeOff, Sparkles } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginInner />
+    </Suspense>
+  );
+}
+
+function LoginInner() {
   const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState<"google" | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+  const search = useSearchParams();
+  const next = search?.get("next") ?? "/account";
+  const queryError = search?.get("error");
+
+  async function onGoogle() {
+    setErr(null);
+    setLoading("google");
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+        },
+      });
+      if (error) {
+        setErr(error.message);
+        setLoading(null);
+      }
+      // success → browser is redirecting, keep the spinner state
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Sign-in failed");
+      setLoading(null);
+    }
+  }
   return (
     <div className="grid min-h-screen place-items-center pt-24">
       <div className="container max-w-md">
@@ -37,12 +74,26 @@ export default function LoginPage() {
               Sign in to continue your intelligent shopping journey.
             </p>
 
-            <div className="mt-6 grid gap-2">
-              <button className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm hover:bg-white/[0.06]">
-                <GoogleIcon /> Continue with Google
-              </button>
-              <button className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm hover:bg-white/[0.06]">
-                <AppleIcon /> Continue with Apple
+            {(err || queryError) && (
+              <div className="mt-6 flex items-start gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-200">
+                <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+                <span>{err ?? queryError}</span>
+              </div>
+            )}
+
+            <div className="mt-6">
+              <button
+                type="button"
+                onClick={onGoogle}
+                disabled={loading === "google"}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {loading === "google" ? (
+                  <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                ) : (
+                  <GoogleIcon />
+                )}
+                {loading === "google" ? "Redirecting…" : "Continue with Google"}
               </button>
             </div>
 
@@ -125,10 +176,3 @@ function GoogleIcon() {
   );
 }
 
-function AppleIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff" aria-hidden>
-      <path d="M16.365 1.43c0 1.14-.39 2.21-1.04 3.04-.7.88-1.84 1.55-2.94 1.46-.13-1.12.42-2.27 1.07-3.02.74-.88 2-1.55 2.91-1.48zM20.5 17.16c-.6 1.37-.89 1.97-1.66 3.18-1.07 1.66-2.58 3.73-4.45 3.74-1.65.02-2.08-1.06-4.34-1.06-2.26 0-2.72 1.04-4.37 1.07-1.78.03-3.13-1.84-4.2-3.5C-.5 17.2-.84 11.6 1.7 8.65c1.62-1.85 3.7-2.94 5.7-2.94 1.74 0 2.85 1.04 4.32 1.04 1.43 0 2.3-1.04 4.31-1.04 1.51 0 3.12.82 4.27 2.22-3.76 2.06-3.15 7.45.2 9.23z" />
-    </svg>
-  );
-}

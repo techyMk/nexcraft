@@ -15,7 +15,10 @@
       "Bash(node scripts/convert-logos.mjs)",
       "Bash(node scripts/build-favicon.mjs)",
       "Bash(curl -s -o /dev/null -w '%{http_code}' http://localhost:3003__TRACKED_VAR__)",
-      "Bash(pkill -f \"next dev\")"
+      "Bash(pkill -f \"next dev\")",
+      "Bash(awk -F= '{print $1, \"= \"\\(length\\($2\\) > 0 ? \"[set, \"length\\($2\\)-2\" chars]\" : \"[EMPTY]\"\\)}')",
+      "Bash(awk '/^NEXT_PUBLIC_SUPABASE_URL=/ {print \"Lines containing NEXT_PUBLIC_SUPABASE_URL:\", NR; print \"  raw:\", $0; print \"  length:\", length\\($0\\); print \"  hex of first 60:\", substr\\($0,1,60\\)}' .env.local)",
+      "Bash(powershell.exe -NoProfile -Command \"Get-Process node -ErrorAction SilentlyContinue | Select-Object Id, ProcessName, StartTime | Format-Table -AutoSize\")"
     ]
   }
 }

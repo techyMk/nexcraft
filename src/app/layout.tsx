@@ -7,6 +7,7 @@ import { CartDrawer } from "@/components/cart-drawer";
 import { AnimatedBg } from "@/components/animated-bg";
 import { AIAssistantFab } from "@/components/ai-assistant-fab";
 import { CommandPalette } from "@/components/command-palette";
+import { ScrollProgress } from "@/components/scroll-progress";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -54,6 +55,7 @@ export default function RootLayout({
       <body className="relative overflow-x-hidden bg-bg text-text">
         <AnimatedBg />
         <Navbar />
+        <ScrollProgress />
         <main className="relative z-10">{children}</main>
         <Footer />
         <CartDrawer />
