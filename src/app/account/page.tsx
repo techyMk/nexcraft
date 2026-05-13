@@ -12,7 +12,7 @@ export default async function AccountPage() {
 
   if (!user) redirect("/login?next=/account");
 
-  const [{ data: profile }, ordersResp, totalsResp] = await Promise.all([
+  const [profileResp, ordersResp, totalsResp] = await Promise.all([
     supabase
       .from("profiles")
       .select("full_name, avatar_url, role, created_at")
@@ -32,6 +32,12 @@ export default async function AccountPage() {
       .eq("user_id", user.id),
   ]);
 
+  // Surface RLS / DB errors to Vercel logs so silent fallbacks never hide a real bug.
+  if (profileResp.error) console.error("[account] profile read failed:", profileResp.error);
+  if (ordersResp.error)  console.error("[account] orders read failed:",  ordersResp.error);
+  if (totalsResp.error)  console.error("[account] totals read failed:",  totalsResp.error);
+
+  const profile = profileResp.data;
   const orders = ordersResp.data ?? [];
   const allOrders = totalsResp.data ?? [];
   const ordersCount = totalsResp.count ?? 0;

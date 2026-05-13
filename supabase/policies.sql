@@ -3,6 +3,24 @@
 --  Run AFTER all migrations. Idempotent — drops then recreates.
 -- ════════════════════════════════════════════════════════════
 
+-- Helper: non-recursive admin check. Bypasses RLS so it can be called
+-- from policies on the profiles table without infinite recursion.
+create or replace function public.is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select coalesce(
+    (select role in ('admin','super_admin') from public.profiles where id = auth.uid()),
+    false
+  );
+$$;
+
+revoke all on function public.is_admin() from public;
+grant execute on function public.is_admin() to authenticated, anon;
+
 -- Enable RLS on every public table
 alter table public.categories     enable row level security;
 alter table public.products       enable row level security;
@@ -36,12 +54,7 @@ create policy "profiles_owner_update"
 -- Admins can read every profile (for the customers admin page)
 drop policy if exists "profiles_admin_read" on public.profiles;
 create policy "profiles_admin_read"
-  on public.profiles for select using (
-    exists (
-      select 1 from public.profiles p
-      where p.id = auth.uid() and p.role in ('admin','super_admin')
-    )
-  );
+  on public.profiles for select using (public.is_admin());
 
 -- ────────────────────────────────────────────────────────────
 -- Wishlist: scoped to the owner
@@ -65,21 +78,11 @@ create policy "orders_owner_insert"
 
 drop policy if exists "orders_admin_read" on public.orders;
 create policy "orders_admin_read"
-  on public.orders for select using (
-    exists (
-      select 1 from public.profiles p
-      where p.id = auth.uid() and p.role in ('admin','super_admin')
-    )
-  );
+  on public.orders for select using (public.is_admin());
 
 drop policy if exists "orders_admin_update" on public.orders;
 create policy "orders_admin_update"
-  on public.orders for update using (
-    exists (
-      select 1 from public.profiles p
-      where p.id = auth.uid() and p.role in ('admin','super_admin')
-    )
-  );
+  on public.orders for update using (public.is_admin());
 
 -- ────────────────────────────────────────────────────────────
 -- Order items: read whatever you can read on the parent order
@@ -104,9 +107,4 @@ create policy "order_items_owner_insert"
 
 drop policy if exists "order_items_admin_read" on public.order_items;
 create policy "order_items_admin_read"
-  on public.order_items for select using (
-    exists (
-      select 1 from public.profiles p
-      where p.id = auth.uid() and p.role in ('admin','super_admin')
-    )
-  );
+  on public.order_items for select using (public.is_admin());
