@@ -24,6 +24,12 @@ import { createClient } from "@/lib/supabase/client";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Supabase Email OTP length is configurable (Auth → Email → Email OTP
+// Length) from 6 to 10. Accept the full range so the verify form works
+// regardless of what the dashboard is set to.
+const MIN_OTP = 6;
+const MAX_OTP = 10;
+
 type Step = "form" | "verify";
 
 export default function RegisterPage() {
@@ -160,8 +166,8 @@ export default function RegisterPage() {
 
   async function onVerify(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (code.length !== 6) {
-      setErr("Enter the 6-digit code from your email.");
+    if (code.length < MIN_OTP) {
+      setErr(`Enter the full code from your email (${MIN_OTP}–${MAX_OTP} digits).`);
       return;
     }
     setErr(null);
@@ -514,7 +520,7 @@ export default function RegisterPage() {
                           Verify your email
                         </h1>
                         <p className="text-sm text-text-2">
-                          Enter the 6-digit code we sent to{" "}
+                          Enter the code we sent to{" "}
                           <span className="text-white">{email}</span>
                         </p>
                       </div>
@@ -540,20 +546,22 @@ export default function RegisterPage() {
                       <input
                         ref={codeInputRef}
                         inputMode="numeric"
-                        pattern="[0-9]{6}"
-                        maxLength={6}
+                        pattern="[0-9]*"
+                        maxLength={MAX_OTP}
                         autoComplete="one-time-code"
                         value={code}
                         onChange={(e) =>
-                          setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+                          setCode(
+                            e.target.value.replace(/\D/g, "").slice(0, MAX_OTP),
+                          )
                         }
-                        placeholder="000000"
+                        placeholder={"0".repeat(MIN_OTP)}
                         aria-label="Verification code"
-                        className="w-full rounded-2xl border border-white/[0.08] bg-white/[0.03] py-4 text-center font-mono text-3xl font-semibold tracking-[0.45em] outline-none focus:border-primary-400/60 focus:ring-2 focus:ring-primary-400/20"
+                        className="w-full rounded-2xl border border-white/[0.08] bg-white/[0.03] py-4 text-center font-mono text-3xl font-semibold tracking-[0.3em] tabular-nums outline-none focus:border-primary-400/60 focus:ring-2 focus:ring-primary-400/20"
                       />
                       <button
                         type="submit"
-                        disabled={loading === "verify" || code.length !== 6}
+                        disabled={loading === "verify" || code.length < MIN_OTP}
                         className="btn btn-primary w-full disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {loading === "verify" ? (
