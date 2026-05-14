@@ -25,21 +25,20 @@ for (const j of jobs) {
   console.log(`${j.in} → ${j.out} · ${out.width}×${out.height}`);
 }
 
-// Bot icon: crop the bottom reflection so the bot fills the AI FAB cleanly.
+// Bot icon: take a SQUARE crop centered on the bot's body so it fills a
+// 1:1 frame in the AI FAB without distortion. The bot fills roughly the
+// top 75% of the source; the bottom is reflection shadow we discard.
 {
   const inputPath = path.join(srcDir, "bot-icon.png");
   const outputPath = path.join(outDir, "bot-icon.webp");
   const meta = await sharp(inputPath).metadata();
   const w = meta.width ?? 0;
   const h = meta.height ?? 0;
-  // Top 68% of the image — everything below is the soft shadow reflection.
-  const cropHeight = Math.round(h * 0.68);
+  const side = Math.min(w, Math.round(h * 0.78)); // square edge length
+  const left = Math.round((w - side) / 2);
   await sharp(inputPath)
-    .extract({ left: 0, top: 0, width: w, height: cropHeight })
-    .resize(256, 256, {
-      fit: "contain",
-      background: { r: 0, g: 0, b: 0, alpha: 0 },
-    })
+    .extract({ left, top: 0, width: side, height: side })
+    .resize(256, 256)
     .webp({ quality: 92, alphaQuality: 100, effort: 6 })
     .toFile(outputPath);
   const out = await sharp(outputPath).metadata();
