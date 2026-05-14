@@ -4,16 +4,17 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
-  Package,
-  Tags,
-  ShoppingCart,
-  Users,
-  Sparkles,
-  Settings,
-  Wallet,
   BarChart3,
+  Brain,
+  LayoutDashboard,
   LogOut,
+  Package,
+  Settings,
+  ShoppingCart,
+  Sparkles,
+  Tags,
+  Users,
+  Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -24,6 +25,7 @@ const groups = [
       { href: "/admin", label: "Dashboard", Icon: LayoutDashboard },
       { href: "/admin/analytics", label: "Analytics", Icon: BarChart3 },
       { href: "/admin/ai", label: "AI Insights", Icon: Sparkles },
+      { href: "/admin/knowledge", label: "Knowledge", Icon: Brain },
     ],
   },
   {

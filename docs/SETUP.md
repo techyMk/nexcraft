@@ -271,6 +271,67 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe
 
 ---
 
+## 10. AI knowledge base (RAG)
+
+The chat bubble at the bottom-right uses Claude for replies and OpenAI
+embeddings + pgvector for retrieval over documents you upload.
+
+### 10.1 Run the migration
+
+Open `supabase/migrations/006_knowledge_base.sql` in VS Code → copy →
+paste into Supabase **SQL Editor → + New query** → **Run**. This:
+
+- enables the `vector` extension
+- creates `kb_documents` and `kb_chunks(vector(1536))`
+- creates the `match_kb_chunks` similarity-search function
+- enables RLS (admin-only writes)
+- provisions the private `kb` storage bucket with policies
+
+**Verify:** Database → Extensions shows `vector` ✓ · Database → Tables shows
+`kb_documents` + `kb_chunks` · Storage → Buckets shows `kb`.
+
+### 10.2 Add your API keys
+
+In `.env.local` (and the same vars in Vercel for prod):
+
+```
+ANTHROPIC_API_KEY=sk-ant-...   # https://console.anthropic.com
+OPENAI_API_KEY=sk-proj-...     # https://platform.openai.com — embeddings only
+```
+
+Restart `npm run dev` after editing `.env.local`.
+
+### 10.3 Upload your company doc
+
+1. Sign in as an admin
+2. Go to **/admin/knowledge**
+3. Pick a PDF, TXT or MD up to 20 MB
+4. Click **Upload + index** — wait 5–30 seconds while it parses, chunks,
+   and embeds. You should see the status flip to **READY** with a chunk
+   count.
+
+### 10.4 Talk to the bot
+
+Click the floating bot icon (bottom-right of any non-admin page). Ask
+something specific to your company doc. The bot will:
+
+1. Embed your question
+2. Find the 6 most relevant chunks from your indexed documents
+3. Ask Claude to answer using only that context
+4. Stream the reply back, with **Source: <document title>** at the end
+
+If you ask something not covered in any document, the bot will politely
+say it doesn't know — it won't hallucinate.
+
+### 10.5 Costs
+
+- **Embeddings:** $0.02 per 1M tokens. A 50-page handbook ≈ 25k tokens =
+  $0.0005.
+- **Chat:** Claude Sonnet 4.6 is ~$3/1M input + $15/1M output. A typical
+  chat turn with retrieved context is ~$0.01–0.02.
+
+---
+
 ## Troubleshooting
 
 The API routes always return JSON, even on errors. If the UI shows a toast
@@ -281,6 +342,9 @@ like one of these, do the listed fix:
 | `STRIPE_SECRET_KEY is not set on the server.` | Add the env var in Vercel → Settings → Environment Variables, then redeploy |
 | `STRIPE_WEBHOOK_SECRET is not set on the server.` | Same — but use the `whsec_` from Stripe Dashboard, not the CLI |
 | `Database missing 'orders' table — run supabase/migrations/002_orders.sql` | Run that migration in Supabase SQL Editor |
+| `Database is missing the knowledge_base tables` | Run `supabase/migrations/006_knowledge_base.sql` |
+| `OPENAI_API_KEY is not set on the server` | Add it to `.env.local` / Vercel and restart/redeploy |
+| Chat reply says "I don't have details on that" | Either no documents are indexed yet, or the question is outside the docs. Upload more via `/admin/knowledge`. |
 | `Invalid JSON body` | Check the request body — usually a missing `Content-Type: application/json` header |
 | `Sign in to save items` | The wishlist sync route requires an authenticated user |
 | `permission denied for table products` | RLS policy missing — re-run `supabase/policies.sql` |
