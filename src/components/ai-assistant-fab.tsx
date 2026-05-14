@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Sparkles, X, Send } from "lucide-react";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
@@ -25,11 +26,22 @@ export function AIAssistantFab() {
         transition={{ delay: 0.6, type: "spring", stiffness: 280 }}
         whileHover={{ scale: 1.05 }}
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-6 right-6 z-[60] inline-flex h-14 w-14 items-center justify-center rounded-full bg-gradient-brand text-white shadow-glow ring-1 ring-white/20"
-        aria-label="AI assistant"
+        className="fixed bottom-6 right-6 z-[60] inline-flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-gradient-brand text-white shadow-glow ring-1 ring-white/20"
+        aria-label={open ? "Close AI assistant" : "Open AI assistant"}
       >
         <span className="absolute inset-0 -z-10 animate-pulse-slow rounded-full bg-gradient-brand opacity-50 blur-xl" />
-        {open ? <X size={20} /> : <Sparkles size={20} />}
+        {open ? (
+          <X size={20} />
+        ) : (
+          <Image
+            src="/brand/bot-icon.webp"
+            alt=""
+            width={256}
+            height={256}
+            priority
+            className="h-11 w-11 object-contain drop-shadow"
+          />
+        )}
       </motion.button>
 
       <AnimatePresence>

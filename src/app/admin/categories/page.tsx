@@ -2,7 +2,6 @@
 
 import { Pencil, Plus, Search, Tag, Trash2 } from "lucide-react";
 import { categories, products } from "@/lib/data";
-import { CategoryIcon } from "@/lib/icons";
 
 export default function AdminCategories() {
   return (
@@ -44,9 +43,17 @@ export default function AdminCategories() {
               className="group relative overflow-hidden rounded-3xl border border-white/[0.06] bg-white/[0.02] p-5 backdrop-blur-xl transition hover:border-white/[0.14]"
             >
               <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-primary-500/15 blur-3xl opacity-0 transition group-hover:opacity-100" />
-              <div className="flex items-start justify-between">
-                <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-brand text-white shadow-glow">
-                  <CategoryIcon slug={c.slug} size={22} />
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-text-2">
+                    Category
+                  </div>
+                  <div className="mt-2 font-display text-xl font-semibold leading-tight tracking-tight">
+                    {c.name}
+                  </div>
+                  <div className="mt-1 font-mono text-[11px] text-text-2">
+                    /{c.slug}
+                  </div>
                 </div>
                 <div className="flex gap-1">
                   <button
@@ -63,8 +70,6 @@ export default function AdminCategories() {
                   </button>
                 </div>
               </div>
-              <div className="mt-4 font-display text-lg font-semibold">{c.name}</div>
-              <div className="mt-1 text-xs text-text-2">/{c.slug}</div>
               <div className="mt-4 flex items-center justify-between text-xs">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.04] px-2.5 py-1 text-text-2 ring-1 ring-white/[0.06]">
                   <Tag size={11} /> {count} products

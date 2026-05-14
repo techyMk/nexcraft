@@ -18,7 +18,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { categories, products } from "@/lib/data";
-import { CategoryIcon } from "@/lib/icons";
 import { formatPrice } from "@/lib/utils";
 import { useCommandPalette } from "@/store/command";
 
@@ -208,8 +207,8 @@ export function CommandPalette() {
                               closePalette();
                             }}
                             left={
-                              <span className="grid h-9 w-9 place-items-center rounded-lg bg-white/[0.04] text-primary-300 ring-1 ring-white/[0.06]">
-                                <CategoryIcon slug={c.slug} size={16} />
+                              <span className="grid h-9 w-9 place-items-center rounded-lg bg-white/[0.04] font-display text-xs font-semibold uppercase tracking-widest text-primary-300 ring-1 ring-white/[0.06]">
+                                {c.name.slice(0, 2)}
                               </span>
                             }
                             label={c.name}

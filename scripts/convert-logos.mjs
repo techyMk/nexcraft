@@ -24,3 +24,24 @@ for (const j of jobs) {
   const out = await sharp(outputPath).metadata();
   console.log(`${j.in} → ${j.out} · ${out.width}×${out.height}`);
 }
+
+// Bot icon: crop the bottom reflection so the bot fills the AI FAB cleanly.
+{
+  const inputPath = path.join(srcDir, "bot-icon.png");
+  const outputPath = path.join(outDir, "bot-icon.webp");
+  const meta = await sharp(inputPath).metadata();
+  const w = meta.width ?? 0;
+  const h = meta.height ?? 0;
+  // Top 68% of the image — everything below is the soft shadow reflection.
+  const cropHeight = Math.round(h * 0.68);
+  await sharp(inputPath)
+    .extract({ left: 0, top: 0, width: w, height: cropHeight })
+    .resize(256, 256, {
+      fit: "contain",
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    })
+    .webp({ quality: 92, alphaQuality: 100, effort: 6 })
+    .toFile(outputPath);
+  const out = await sharp(outputPath).metadata();
+  console.log(`bot-icon.png → bot-icon.webp · ${out.width}×${out.height}`);
+}
