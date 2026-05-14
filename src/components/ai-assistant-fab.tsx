@@ -3,7 +3,10 @@
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertTriangle,
+  Check,
+  Copy,
   Loader2,
+  Pencil,
   RefreshCw,
   Send,
   Sparkles,
@@ -192,6 +195,18 @@ export function AIAssistantFab() {
     setInput("");
   }
 
+  function onEdit(id: string) {
+    if (streaming) return;
+    const idx = messages.findIndex((m) => m.id === id);
+    if (idx === -1) return;
+    const target = messages[idx];
+    if (target.role !== "user") return;
+    setMessages(messages.slice(0, idx));
+    setInput(target.content);
+    setErr(null);
+    setTimeout(() => inputRef.current?.focus(), 0);
+  }
+
   return (
     <>
       <motion.button
@@ -284,11 +299,11 @@ export function AIAssistantFab() {
                   {messages.map((m) => (
                     <li
                       key={m.id}
-                      className={
+                      className={`group ${
                         m.role === "user"
                           ? "ml-auto max-w-[85%]"
                           : "max-w-[90%]"
-                      }
+                      }`}
                     >
                       <div
                         className={
@@ -311,6 +326,24 @@ export function AIAssistantFab() {
                           </span>
                         )}
                       </div>
+                      {m.content && (
+                        <div
+                          className={`mt-1 flex gap-1 opacity-0 transition group-hover:opacity-100 group-focus-within:opacity-100 ${
+                            m.role === "user" ? "justify-end" : ""
+                          }`}
+                        >
+                          {m.role === "user" && (
+                            <IconAction
+                              label="Edit message"
+                              onClick={() => onEdit(m.id)}
+                              disabled={streaming}
+                            >
+                              <Pencil size={12} />
+                            </IconAction>
+                          )}
+                          <CopyAction text={m.content} />
+                        </div>
+                      )}
                       {m.sources && m.sources.length > 0 && (
                         <div className="mt-1.5 flex flex-wrap items-center gap-1 text-[10px] text-text-2">
                           <Sparkles size={10} className="text-primary-300" />
@@ -453,5 +486,54 @@ function ChatMarkdown({ content }: { content: string }) {
         {content}
       </ReactMarkdown>
     </div>
+  );
+}
+
+function IconAction({
+  children,
+  label,
+  onClick,
+  disabled,
+}: {
+  children: React.ReactNode;
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={label}
+      title={label}
+      className="grid h-6 w-6 place-items-center rounded-full text-text-2 transition hover:bg-white/[0.06] hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+    >
+      {children}
+    </button>
+  );
+}
+
+function CopyAction({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+
+  async function onCopy() {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* ignore — older browsers without clipboard API */
+    }
+  }
+
+  return (
+    <IconAction label={copied ? "Copied" : "Copy message"} onClick={onCopy}>
+      {copied ? (
+        <Check size={12} className="text-emerald-300" />
+      ) : (
+        <Copy size={12} />
+      )}
+    </IconAction>
   );
 }
