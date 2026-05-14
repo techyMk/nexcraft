@@ -53,9 +53,13 @@ export async function AdminTopbar() {
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <span className="chip">
+        <Link
+          href="/admin/ai"
+          aria-label="Open AI Insights"
+          className="chip transition hover:brightness-125"
+        >
           <Sparkles size={12} /> AI Copilot
-        </span>
+        </Link>
         <button
           aria-label="Notifications"
           className="relative grid h-9 w-9 place-items-center rounded-full border border-white/[0.06] bg-white/[0.03] text-text-2 hover:text-white"
