@@ -146,50 +146,64 @@ export function KnowledgeView({ documents }: { documents: Doc[] }) {
           PDF, TXT or MD up to 20 MB. Indexing usually takes 5–30 seconds.
         </p>
 
-        <form onSubmit={onUpload} className="mt-5 grid gap-3 md:grid-cols-[1.4fr_1fr_auto] md:items-end">
-          <label className="block">
-            <span className="mb-1.5 block text-xs uppercase tracking-widest text-text-2">
-              Title (optional)
-            </span>
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. NexCart company handbook"
-              className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 text-sm outline-none focus:border-primary-400/60 focus:ring-2 focus:ring-primary-400/20"
-            />
-          </label>
-          <label className="block">
-            <span className="mb-1.5 block text-xs uppercase tracking-widest text-text-2">
-              File
-            </span>
-            <input
-              ref={fileInput}
-              type="file"
-              accept=".pdf,.txt,.md,application/pdf,text/plain,text/markdown"
-              onChange={onFileChange}
-              className="block w-full cursor-pointer rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm text-text-2 file:mr-3 file:rounded-full file:border-0 file:bg-white/[0.07] file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-white hover:file:bg-white/[0.12]"
-            />
-          </label>
-          <button
-            type="submit"
-            disabled={uploading || !file}
-            className="btn btn-primary justify-self-start disabled:cursor-not-allowed disabled:opacity-60 md:justify-self-end"
-          >
-            {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
-            {uploading ? "Indexing…" : "Upload + index"}
-          </button>
+        <form onSubmit={onUpload} className="mt-5 space-y-4">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="block min-w-0">
+              <span className="mb-1.5 block text-xs uppercase tracking-widest text-text-2">
+                Title (optional)
+              </span>
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g. NexCart company handbook"
+                className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 text-sm outline-none focus:border-primary-400/60 focus:ring-2 focus:ring-primary-400/20"
+              />
+            </label>
+            <label className="block min-w-0">
+              <span className="mb-1.5 block text-xs uppercase tracking-widest text-text-2">
+                File
+              </span>
+              <input
+                ref={fileInput}
+                type="file"
+                accept=".pdf,.txt,.md,application/pdf,text/plain,text/markdown"
+                onChange={onFileChange}
+                className="block w-full cursor-pointer rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm text-text-2 file:mr-3 file:rounded-full file:border-0 file:bg-white/[0.07] file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-white hover:file:bg-white/[0.12]"
+              />
+            </label>
+          </div>
+
+          <div className="flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-end">
+            {file && (
+              <span className="truncate text-xs text-text-2">
+                Ready: <span className="text-text">{file.name}</span> · {bytes(file.size)}
+              </span>
+            )}
+            <button
+              type="submit"
+              disabled={uploading || !file}
+              className="btn btn-primary shrink-0 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {uploading ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Upload size={14} />
+              )}
+              {uploading ? "Indexing…" : "Upload + index"}
+            </button>
+          </div>
         </form>
 
         {err && (
           <div className="mt-4 flex items-start gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-200">
             <AlertTriangle size={14} className="mt-0.5 shrink-0" />
-            <span>{err}</span>
+            <span className="break-words">{err}</span>
           </div>
         )}
         {msg && (
           <div className="mt-4 flex items-start gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5 text-sm text-emerald-200">
             <CheckCircle2 size={14} className="mt-0.5 shrink-0" />
-            <span>{msg}</span>
+            <span className="break-words">{msg}</span>
           </div>
         )}
       </div>

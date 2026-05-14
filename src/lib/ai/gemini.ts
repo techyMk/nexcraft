@@ -4,12 +4,13 @@ import { requireEnv } from "@/lib/env";
 /**
  * Gemini embeddings via REST (no SDK).
  *
- * - Model: text-embedding-004 (768 dim)
- * - Free tier: 1500 req/min, plenty for our scale
+ * - Model: gemini-embedding-001 (MRL — we ask for 768 dims to match the
+ *   pgvector column from migration 007). Google deprecated the older
+ *   text-embedding-004 endpoint and replaced it with this.
  * - Get a key at https://aistudio.google.com/apikey (Google account, no CC)
  */
 
-const MODEL_PATH = "models/text-embedding-004";
+const MODEL_PATH = "models/gemini-embedding-001";
 const BASE = "https://generativelanguage.googleapis.com/v1beta";
 export const EMBED_DIM = 768;
 
@@ -30,10 +31,11 @@ async function call<T>(path: string, body: unknown): Promise<T> {
   return (await res.json()) as T;
 }
 
-/** Embed a single piece of text. Returns a 768-dim vector. */
+/** Embed a single piece of text. Returns an EMBED_DIM-sized vector. */
 export async function embed(text: string): Promise<number[]> {
   const data = await call<EmbedResp>(`${MODEL_PATH}:embedContent`, {
     content: { parts: [{ text }] },
+    outputDimensionality: EMBED_DIM,
   });
   return data.embedding.values;
 }
@@ -45,6 +47,7 @@ export async function embedBatch(texts: string[]): Promise<number[][]> {
     requests: texts.map((text) => ({
       model: MODEL_PATH,
       content: { parts: [{ text }] },
+      outputDimensionality: EMBED_DIM,
     })),
   });
   return data.embeddings.map((e) => e.values);
