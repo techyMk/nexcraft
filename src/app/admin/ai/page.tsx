@@ -1,53 +1,207 @@
-"use client";
-
-import { motion } from "framer-motion";
 import {
+  AlertTriangle,
+  ArrowUpRight,
+  Boxes,
+  Brain,
+  CheckCircle2,
+  FileText,
+  ShoppingBag,
   Sparkles,
   TrendingUp,
-  TrendingDown,
-  Brain,
-  AlertTriangle,
-  CheckCircle2,
-  ArrowUpRight,
+  Users,
 } from "lucide-react";
-import Image from "next/image";
-import { products } from "@/lib/data";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
 import { formatPrice } from "@/lib/utils";
 
-const signals = [
-  {
-    tone: "success" as const,
-    Icon: CheckCircle2,
-    title: "Audio category is trending up",
-    body: "Engagement is +24% vs last week. Boost AirPods Pro 2 to top of homepage to capture demand.",
-    action: "Promote on homepage",
-  },
-  {
-    tone: "warning" as const,
-    Icon: AlertTriangle,
-    title: "iPhone 15 Pro Max nearing stockout",
-    body: "Projected sellout in ~72h based on current velocity. Suggest restocking 200 units.",
-    action: "Reorder stock",
-  },
-  {
-    tone: "info" as const,
-    Icon: Sparkles,
-    title: "High-intent cohort detected",
-    body: "342 users have viewed MacBook Pro M3 ≥ 3 times this week. Triggering personalized push.",
-    action: "Run AI campaign",
-  },
-];
+export const dynamic = "force-dynamic";
 
-const toneStyles = {
+type Signal = {
+  tone: "success" | "warning" | "info";
+  Icon: typeof Sparkles;
+  title: string;
+  body: string;
+  actionHref: string;
+  actionLabel: string;
+};
+
+const toneStyles: Record<Signal["tone"], string> = {
   success: "bg-emerald-500/15 text-emerald-300 ring-emerald-500/30",
   warning: "bg-amber-500/15 text-amber-300 ring-amber-500/30",
   info: "bg-primary-500/15 text-primary-200 ring-primary-500/30",
 };
 
-const intentBars = [12, 18, 22, 14, 26, 32, 28, 40, 36, 52, 48, 64, 58, 76, 70, 92];
+function timeAgo(iso: string) {
+  const diff = (Date.now() - new Date(iso).getTime()) / 1000;
+  if (diff < 60) return "just now";
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  return `${Math.floor(diff / 86400)}d ago`;
+}
 
-export default function AdminAIInsights() {
-  const aiPicks = products.filter((p) => p.badge === "AI PICK").slice(0, 4);
+export default async function AdminAIInsights() {
+  const supabase = createClient();
+
+  // Parallel fetches against existing tables — falls back gracefully on errors.
+  const [
+    productsCount,
+    lowStockCount,
+    customersCount,
+    ordersCount,
+    kbDocsCount,
+    kbChunksCount,
+    lowStockRows,
+    revenueRows,
+    recentDocs,
+  ] = await Promise.all([
+    supabase.from("products").select("*", { count: "exact", head: true }),
+    supabase
+      .from("products")
+      .select("*", { count: "exact", head: true })
+      .lt("stock", 10),
+    supabase.from("profiles").select("*", { count: "exact", head: true }),
+    supabase.from("orders").select("*", { count: "exact", head: true }),
+    supabase
+      .from("kb_documents")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "ready"),
+    supabase.from("kb_chunks").select("*", { count: "exact", head: true }),
+    supabase
+      .from("products")
+      .select("id, name, slug, stock, category:categories(name)")
+      .lt("stock", 10)
+      .order("stock", { ascending: true })
+      .limit(5),
+    supabase
+      .from("revenue_by_day")
+      .select("day, revenue, orders")
+      .limit(14),
+    supabase
+      .from("kb_documents")
+      .select("id, title, chunk_count, status, created_at")
+      .eq("status", "ready")
+      .order("created_at", { ascending: false })
+      .limit(5),
+  ]);
+
+  const totalProducts = productsCount.count ?? 0;
+  const totalLowStock = lowStockCount.count ?? 0;
+  const totalCustomers = customersCount.count ?? 0;
+  const totalOrders = ordersCount.count ?? 0;
+  const totalKbDocs = kbDocsCount.count ?? 0;
+  const totalKbChunks = kbChunksCount.count ?? 0;
+  const lowStock = lowStockRows.data ?? [];
+  const revenue = (revenueRows.data ?? [])
+    .slice()
+    .reverse() as { day: string; revenue: number; orders: number }[];
+  const docs = recentDocs.data ?? [];
+
+  const totalRevenue = revenue.reduce(
+    (acc, r) => acc + Number(r.revenue ?? 0),
+    0,
+  );
+  const maxRevenue = revenue.reduce(
+    (acc, r) => Math.max(acc, Number(r.revenue ?? 0)),
+    1,
+  );
+
+  // Build live signals from real state
+  const signals: Signal[] = [];
+
+  if (totalLowStock > 0) {
+    const sample = lowStock
+      .slice(0, 3)
+      .map((p) => p.name)
+      .join(", ");
+    signals.push({
+      tone: "warning",
+      Icon: AlertTriangle,
+      title: `${totalLowStock} product${totalLowStock === 1 ? "" : "s"} running low`,
+      body: `${sample}${totalLowStock > 3 ? ` and ${totalLowStock - 3} more` : ""} ${totalLowStock === 1 ? "is" : "are"} under 10 units. Restock to keep the storefront stocked.`,
+      actionHref: "/admin/products",
+      actionLabel: "Review stock",
+    });
+  } else if (totalProducts > 0) {
+    signals.push({
+      tone: "success",
+      Icon: CheckCircle2,
+      title: "Stock looks healthy",
+      body: `All ${totalProducts} products have 10+ units in stock. No restock alerts.`,
+      actionHref: "/admin/products",
+      actionLabel: "Manage catalog",
+    });
+  }
+
+  if (totalKbDocs === 0) {
+    signals.push({
+      tone: "info",
+      Icon: Brain,
+      title: "Knowledge base is empty",
+      body: "Upload your company handbook so the AI assistant can answer customer questions about shipping, returns, warranties, and more.",
+      actionHref: "/admin/knowledge",
+      actionLabel: "Upload docs",
+    });
+  } else {
+    signals.push({
+      tone: "success",
+      Icon: CheckCircle2,
+      title: `Knowledge base ready · ${totalKbChunks.toLocaleString()} chunk${totalKbChunks === 1 ? "" : "s"}`,
+      body: `Indexed across ${totalKbDocs} document${totalKbDocs === 1 ? "" : "s"}. The storefront chat assistant is grounding replies in this content.`,
+      actionHref: "/admin/knowledge",
+      actionLabel: "Manage docs",
+    });
+  }
+
+  if (totalOrders === 0) {
+    signals.push({
+      tone: "info",
+      Icon: ShoppingBag,
+      title: "No orders yet",
+      body: "Once a customer places an order, you'll see revenue trends, top categories, and conversion signals here.",
+      actionHref: "/admin/orders",
+      actionLabel: "Open orders",
+    });
+  } else {
+    signals.push({
+      tone: "success",
+      Icon: TrendingUp,
+      title: `${totalOrders.toLocaleString()} order${totalOrders === 1 ? "" : "s"} processed`,
+      body: `Lifetime revenue: ${formatPrice(totalRevenue)} across all non-cancelled orders.`,
+      actionHref: "/admin/orders",
+      actionLabel: "All orders",
+    });
+  }
+
+  const kpis = [
+    {
+      l: "Products",
+      v: totalProducts.toLocaleString(),
+      d:
+        totalLowStock > 0
+          ? `${totalLowStock} low stock`
+          : "All stocked",
+      down: totalLowStock > 0,
+      Icon: Boxes,
+    },
+    {
+      l: "Customers",
+      v: totalCustomers.toLocaleString(),
+      d: totalCustomers > 0 ? "Verified profiles" : "—",
+      Icon: Users,
+    },
+    {
+      l: "Orders",
+      v: totalOrders.toLocaleString(),
+      d: totalRevenue > 0 ? formatPrice(totalRevenue) : "No revenue yet",
+      Icon: ShoppingBag,
+    },
+    {
+      l: "KB chunks",
+      v: totalKbChunks.toLocaleString(),
+      d: `${totalKbDocs} doc${totalKbDocs === 1 ? "" : "s"} indexed`,
+      Icon: Brain,
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -58,7 +212,7 @@ export default function AdminAIInsights() {
             AI Insights
           </h1>
           <p className="mt-1 text-sm text-text-2">
-            Live signals from NexCart Intelligence™ · refreshed every 90s
+            Live signals from your Supabase data — refreshes on every page load.
           </p>
         </div>
         <span className="chip">
@@ -66,12 +220,9 @@ export default function AdminAIInsights() {
         </span>
       </div>
 
-      <div className="grid gap-3 lg:grid-cols-3">
-        {[
-          { l: "Model accuracy", v: "94.2%", d: "+0.8% w/w", Icon: Brain, up: true },
-          { l: "Picks served", v: "2.4M", d: "+18%", Icon: Sparkles, up: true },
-          { l: "Bounce rate", v: "12.6%", d: "-1.2%", Icon: TrendingDown, up: true },
-        ].map((k) => (
+      {/* KPI cards */}
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {kpis.map((k) => (
           <div
             key={k.l}
             className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 backdrop-blur-xl"
@@ -85,31 +236,91 @@ export default function AdminAIInsights() {
             <div className="mt-3 font-display text-2xl font-semibold tracking-tight">
               {k.v}
             </div>
-            <div className={`mt-1 inline-flex items-center gap-1 text-xs font-semibold ${k.up ? "text-emerald-400" : "text-rose-400"}`}>
-              <TrendingUp size={12} /> {k.d}
+            <div
+              className={`mt-1 text-xs font-semibold ${
+                k.down ? "text-amber-300" : "text-text-2"
+              }`}
+            >
+              {k.d}
             </div>
           </div>
         ))}
       </div>
 
+      {/* Revenue chart + actions */}
       <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
         <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 backdrop-blur-xl">
           <div className="flex items-center justify-between">
             <div>
+              <div className="text-sm font-semibold">Revenue · last 14 days</div>
+              <div className="text-xs text-text-2">
+                From the <code className="font-mono text-[11px]">revenue_by_day</code> view
+              </div>
+            </div>
+            {totalRevenue > 0 && (
+              <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold text-emerald-300 ring-1 ring-emerald-500/30">
+                {formatPrice(totalRevenue)}
+              </span>
+            )}
+          </div>
+
+          {revenue.length === 0 ? (
+            <div className="mt-6 grid h-48 place-items-center rounded-xl border border-dashed border-white/[0.08] text-center">
+              <div>
+                <ShoppingBag size={20} className="mx-auto text-text-2" />
+                <div className="mt-2 text-sm font-medium">No orders yet</div>
+                <div className="text-xs text-text-2">
+                  This chart fills as orders flow.
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="mt-6 flex h-48 items-end gap-1.5">
+                {revenue.map((r, i) => (
+                  <div
+                    key={i}
+                    title={`${r.day}: ${formatPrice(Number(r.revenue))} · ${r.orders} order${r.orders === 1 ? "" : "s"}`}
+                    style={{
+                      height: `${Math.max(4, (Number(r.revenue) / maxRevenue) * 100)}%`,
+                    }}
+                    className="flex-1 rounded-sm bg-gradient-to-t from-primary-700 to-accent-purple"
+                  />
+                ))}
+              </div>
+              <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
+                <Stat l="Total" v={formatPrice(totalRevenue)} />
+                <Stat
+                  l="Orders"
+                  v={revenue
+                    .reduce((acc, r) => acc + Number(r.orders), 0)
+                    .toLocaleString()}
+                />
+                <Stat
+                  l="Avg / day"
+                  v={formatPrice(totalRevenue / Math.max(1, revenue.length))}
+                />
+              </div>
+            </>
+          )}
+        </div>
+
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 backdrop-blur-xl">
+          <div className="flex items-center justify-between">
+            <div>
               <div className="text-sm font-semibold">Recommended actions</div>
-              <div className="text-xs text-text-2">Prioritized by projected revenue lift</div>
+              <div className="text-xs text-text-2">
+                Built from your live data
+              </div>
             </div>
             <span className="chip">
-              <Sparkles size={12} /> 3 new
+              <Sparkles size={12} /> {signals.length}
             </span>
           </div>
           <ul className="mt-5 space-y-3">
-            {signals.map((s, i) => (
-              <motion.li
+            {signals.map((s) => (
+              <li
                 key={s.title}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: i * 0.05 }}
                 className="flex items-start gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4"
               >
                 <span
@@ -117,74 +328,127 @@ export default function AdminAIInsights() {
                 >
                   <s.Icon size={15} />
                 </span>
-                <div className="flex-1">
+                <div className="min-w-0 flex-1">
                   <div className="text-sm font-semibold">{s.title}</div>
                   <p className="mt-0.5 text-sm text-text-2">{s.body}</p>
+                  <Link
+                    href={s.actionHref}
+                    className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary-300 hover:text-white"
+                  >
+                    {s.actionLabel} <ArrowUpRight size={11} />
+                  </Link>
                 </div>
-                <button className="hidden shrink-0 items-center gap-1.5 rounded-full bg-gradient-brand px-3 py-1.5 text-xs font-semibold text-white shadow-glow md:inline-flex">
-                  {s.action} <ArrowUpRight size={12} />
-                </button>
-              </motion.li>
+              </li>
             ))}
           </ul>
         </div>
-
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 backdrop-blur-xl">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-sm font-semibold">Intent score</div>
-              <div className="text-xs text-text-2">Last 16 hours, live</div>
-            </div>
-            <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold text-emerald-300 ring-1 ring-emerald-500/30">
-              Trending ↑
-            </span>
-          </div>
-          <div className="mt-6 flex h-48 items-end gap-1.5">
-            {intentBars.map((h, i) => (
-              <motion.div
-                key={i}
-                initial={{ height: 0 }}
-                animate={{ height: `${h}%` }}
-                transition={{ duration: 0.6, delay: i * 0.03 }}
-                className="flex-1 rounded-sm bg-gradient-to-t from-primary-700 to-accent-purple"
-              />
-            ))}
-          </div>
-          <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
-            <Stat l="Sessions" v="12,408" />
-            <Stat l="High intent" v="2,140" />
-            <Stat l="Converted" v="586" />
-          </div>
-        </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-xl">
-        <div className="flex items-center justify-between border-b border-white/[0.06] p-5">
-          <div className="text-sm font-semibold">Top AI picks this week</div>
-          <span className="text-xs text-text-2">Ranked by match score</span>
+      {/* Low-stock + recently indexed docs */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-xl">
+          <div className="flex items-center justify-between border-b border-white/[0.06] p-5">
+            <div>
+              <div className="text-sm font-semibold">Low-stock alerts</div>
+              <div className="text-xs text-text-2">Products under 10 units</div>
+            </div>
+            <Link
+              href="/admin/products"
+              className="text-xs text-text-2 hover:text-white"
+            >
+              All products →
+            </Link>
+          </div>
+          {lowStock.length === 0 ? (
+            <div className="grid place-items-center px-6 py-12 text-center">
+              <CheckCircle2 size={20} className="text-emerald-300" />
+              <div className="mt-2 text-sm font-medium">Everything's stocked</div>
+              <div className="text-xs text-text-2">
+                No products under 10 units.
+              </div>
+            </div>
+          ) : (
+            <ul className="divide-y divide-white/[0.06]">
+              {lowStock.map((p) => {
+                const cat = Array.isArray(p.category)
+                  ? p.category[0]
+                  : p.category;
+                return (
+                  <li
+                    key={p.id}
+                    className="flex items-center gap-4 p-4"
+                  >
+                    <span className="grid h-9 w-9 place-items-center rounded-xl bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30">
+                      <AlertTriangle size={14} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <Link
+                        href={`/product/${p.slug}`}
+                        className="block truncate text-sm font-medium hover:text-primary-300"
+                      >
+                        {p.name}
+                      </Link>
+                      <div className="text-xs text-text-2">
+                        {cat?.name ?? "Uncategorised"}
+                      </div>
+                    </div>
+                    <span className="rounded-full bg-rose-500/15 px-2.5 py-1 text-xs font-semibold text-rose-300 ring-1 ring-rose-500/30">
+                      {p.stock} left
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </div>
-        <ul className="divide-y divide-white/[0.06]">
-          {aiPicks.map((p, i) => (
-            <li key={p.id} className="flex items-center gap-4 p-4">
-              <div className="grid h-8 w-8 place-items-center rounded-lg bg-white/[0.04] text-xs text-text-2">
-                {i + 1}
+
+        <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-xl">
+          <div className="flex items-center justify-between border-b border-white/[0.06] p-5">
+            <div>
+              <div className="text-sm font-semibold">Knowledge base</div>
+              <div className="text-xs text-text-2">
+                Documents the AI uses to answer
               </div>
-              <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-white/[0.04]">
-                <Image src={p.images[0]} alt="" fill className="object-cover" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="truncate text-sm">{p.name}</div>
-                <div className="text-xs text-text-2">{p.category}</div>
-              </div>
-              <span className="hidden text-sm font-display font-semibold md:inline">
-                {formatPrice(p.price)}
-              </span>
-              <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-300 ring-1 ring-emerald-500/30">
-                {(98 - i * 2).toFixed(0)}% match
-              </span>
-            </li>
-          ))}
-        </ul>
+            </div>
+            <Link
+              href="/admin/knowledge"
+              className="text-xs text-text-2 hover:text-white"
+            >
+              Manage →
+            </Link>
+          </div>
+          {docs.length === 0 ? (
+            <div className="grid place-items-center px-6 py-12 text-center">
+              <Brain size={20} className="text-text-2" />
+              <div className="mt-2 text-sm font-medium">No documents indexed</div>
+              <Link
+                href="/admin/knowledge"
+                className="btn btn-primary mt-4 text-xs"
+              >
+                Upload your first doc
+              </Link>
+            </div>
+          ) : (
+            <ul className="divide-y divide-white/[0.06]">
+              {docs.map((d) => (
+                <li key={d.id} className="flex items-center gap-4 p-4">
+                  <span className="grid h-9 w-9 place-items-center rounded-xl bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30">
+                    <FileText size={14} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-medium">{d.title}</div>
+                    <div className="text-xs text-text-2">
+                      {d.chunk_count} chunks · indexed {timeAgo(d.created_at)}
+                    </div>
+                  </div>
+                  <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-emerald-300 ring-1 ring-emerald-500/30">
+                    Ready
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     </div>
   );
