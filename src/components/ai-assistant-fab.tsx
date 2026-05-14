@@ -39,7 +39,7 @@ export function AIAssistantFab() {
             width={256}
             height={256}
             priority
-            className="h-11 w-11 object-contain drop-shadow"
+            className="h-9 w-9 object-contain drop-shadow"
           />
         )}
       </motion.button>

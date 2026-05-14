@@ -25,37 +25,26 @@ for (const j of jobs) {
   console.log(`${j.in} → ${j.out} · ${out.width}×${out.height}`);
 }
 
-// Bot icon: trim → drop reflection → pad to square → resize. This way the
-// bot's actual visible mass ends up dead-centre in a 256² canvas, even
-// though the source has a slight head tilt + uneven shoulder/reflection
-// that throws off a fixed-coordinate crop.
+// Bot icon: keep the full bot, just centre it. Pipeline is
+// trim → pad-to-square → resize. No crop, no aspect distortion.
 {
   const inputPath = path.join(srcDir, "bot-icon.png");
   const outputPath = path.join(outDir, "bot-icon.webp");
 
-  // 1) Trim transparent borders so we know the bot's true bounding box.
+  // 1) Trim transparent borders so we get the bot's true bounding box.
   const trimmed = await sharp(inputPath)
     .trim()
     .toBuffer({ resolveWithObject: true });
 
-  // 2) Drop the bottom ~30% (soft reflection shadow under the bot).
-  const cropH = Math.round(trimmed.info.height * 0.7);
-  const botOnly = await sharp(trimmed.data)
-    .extract({
-      left: 0,
-      top: 0,
-      width: trimmed.info.width,
-      height: cropH,
-    })
-    .toBuffer({ resolveWithObject: true });
-
-  // 3) Pad to a perfect square, content centred.
-  const side = Math.max(botOnly.info.width, botOnly.info.height);
-  const padTop = Math.floor((side - botOnly.info.height) / 2);
-  const padBottom = side - botOnly.info.height - padTop;
-  const padLeft = Math.floor((side - botOnly.info.width) / 2);
-  const padRight = side - botOnly.info.width - padLeft;
-  const squared = await sharp(botOnly.data)
+  // 2) Pad with equal transparent pixels on each side to make a square
+  //    canvas — guarantees the bot lands dead-centre regardless of any
+  //    asymmetry in the source.
+  const side = Math.max(trimmed.info.width, trimmed.info.height);
+  const padTop = Math.floor((side - trimmed.info.height) / 2);
+  const padBottom = side - trimmed.info.height - padTop;
+  const padLeft = Math.floor((side - trimmed.info.width) / 2);
+  const padRight = side - trimmed.info.width - padLeft;
+  const squared = await sharp(trimmed.data)
     .extend({
       top: padTop,
       bottom: padBottom,
@@ -65,7 +54,7 @@ for (const j of jobs) {
     })
     .toBuffer({ resolveWithObject: true });
 
-  // 4) Final resize.
+  // 3) Final resize.
   await sharp(squared.data)
     .resize(256, 256)
     .webp({ quality: 92, alphaQuality: 100, effort: 6 })
@@ -73,6 +62,6 @@ for (const j of jobs) {
 
   const out = await sharp(outputPath).metadata();
   console.log(
-    `bot-icon.png → bot-icon.webp · ${out.width}×${out.height} (trimmed ${trimmed.info.width}×${trimmed.info.height} → bot ${botOnly.info.width}×${botOnly.info.height} → square ${side}×${side})`,
+    `bot-icon.png → bot-icon.webp · ${out.width}×${out.height} (trimmed ${trimmed.info.width}×${trimmed.info.height} → square ${side}×${side})`,
   );
 }
