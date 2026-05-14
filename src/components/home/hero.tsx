@@ -132,19 +132,19 @@ function HeroVisual() {
         className="absolute -left-4 top-10 w-64 rounded-2xl border border-white/[0.08] bg-surface/80 p-3 shadow-card backdrop-blur-xl md:-left-10"
       >
         <div className="flex items-center gap-3">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-brand text-white shadow-glow">
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-brand text-white shadow-glow">
             <Sparkles size={16} />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="text-[11px] uppercase tracking-widest text-text-2">
-              AI Recommendation
-            </div>
-            <div className="truncate text-sm font-medium">
+            <div className="truncate text-sm font-medium leading-tight">
               MacBook Pro M3 Max
             </div>
+            <div className="mt-0.5 truncate text-[10px] uppercase tracking-[0.18em] text-text-2">
+              AI Pick
+            </div>
           </div>
-          <span className="rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-semibold text-success ring-1 ring-success/30">
-            98% match
+          <span className="shrink-0 rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-semibold text-success ring-1 ring-success/30">
+            98%
           </span>
         </div>
       </motion.div>
@@ -153,26 +153,28 @@ function HeroVisual() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8, duration: 0.6 }}
-        className="absolute -right-2 bottom-10 w-56 rounded-2xl border border-white/[0.08] bg-surface/80 p-3 shadow-card backdrop-blur-xl md:-right-8"
+        className="absolute -right-2 top-32 w-56 rounded-2xl border border-white/[0.08] bg-surface/80 p-3 shadow-card backdrop-blur-xl md:-right-8 md:top-40"
       >
         <div className="flex items-center gap-3">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/30">
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/30">
             <Truck size={16} />
           </div>
-          <div>
-            <div className="text-[11px] uppercase tracking-widest text-text-2">
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-sm font-medium leading-tight">
+              In 47 minutes
+            </div>
+            <div className="mt-0.5 text-[10px] uppercase tracking-[0.18em] text-text-2">
               Delivery
             </div>
-            <div className="text-sm font-medium">In 47 minutes</div>
           </div>
         </div>
       </motion.div>
 
       <motion.div
-        initial={{ opacity: 0, x: 24 }}
-        animate={{ opacity: 1, x: 0 }}
+        initial={{ opacity: 0, y: 24, x: "-50%" }}
+        animate={{ opacity: 1, y: 0, x: "-50%" }}
         transition={{ delay: 1, duration: 0.6 }}
-        className="absolute -bottom-4 left-1/2 w-60 -translate-x-1/2 rounded-2xl border border-white/[0.08] bg-surface/80 p-3 shadow-card backdrop-blur-xl"
+        className="absolute -bottom-4 left-1/2 w-60 rounded-2xl border border-white/[0.08] bg-surface/80 p-3 shadow-card backdrop-blur-xl"
       >
         <div className="text-[11px] uppercase tracking-widest text-text-2">
           Today&apos;s revenue

@@ -74,22 +74,183 @@ NexCart organises the catalog into 8 categories:
 We feature a curated **"AI Pick"** badge on products our recommendation
 engine ranks in the top 5% for their category and price band.
 
-### Flagship products always in stock
+### Flagship products and prices
 
-- iPhone 15 Pro Max
-- Samsung Galaxy S24 Ultra
-- MacBook Pro 14" M3 Max
-- ASUS ROG Strix G18
-- Sony WH-1000XM5
-- AirPods Pro 2 (USB-C)
-- Apple Watch Ultra 2
-- PlayStation 5 Pro
-- DJI Mavic 3 Pro
-- Meta Quest 3 (512GB)
-- Google Nest Hub Max
+All prices in **US dollars**. Every product includes a 2-year warranty
+and qualifies for free standard shipping when the order subtotal is $50
+or more.
 
-If we ever go out of stock, we'll show the next restock date on the
-product page (typically within 5–7 days).
+| Product | Category | Price | RRP / was | You save |
+|---|---|---|---|---|
+| iPhone 15 Pro Max | Smartphones | **$1,199** | $1,399 | $200 (-14%) |
+| Samsung Galaxy S24 Ultra | Smartphones | **$1,299** | $1,499 | $200 (-13%) |
+| MacBook Pro 14" M3 Max | Laptops | **$2,499** | $2,799 | $300 (-11%) |
+| ASUS ROG Strix G18 | Laptops | **$2,299** | $2,499 | $200 (-8%) |
+| Sony WH-1000XM5 | Audio | **$349** | $399 | $50 (-13%) |
+| AirPods Pro 2 (USB-C) | Audio | **$249** | $279 | $30 (-11%) |
+| Apple Watch Ultra 2 | Wearables | **$799** | — | — |
+| PlayStation 5 Pro | Gaming | **$699** | — | — |
+| Xbox Elite Series 2 | Gaming | **$179** | — | — |
+| DJI Mavic 3 Pro | AI Gadgets | **$2,199** | — | — |
+| Meta Quest 3 (512 GB) | AI Gadgets | **$649** | — | — |
+| Nest Hub Max | Smart Home | **$229** | $269 | $40 (-15%) |
+
+**Category price bands** *(typical street-price ranges, indicative)*:
+
+| Category | Entry | Mid | Flagship |
+|---|---|---|---|
+| Smartphones | $299–$549 | $599–$999 | $1,099–$1,599 |
+| Laptops | $599–$1,099 | $1,199–$1,899 | $1,999–$3,499 |
+| Audio | $79–$199 | $249–$399 | $449–$899 |
+| Wearables | $129–$299 | $349–$499 | $549–$899 |
+| Gaming | $59–$179 | $299–$549 | $599–$899 |
+| Smart Home | $39–$129 | $149–$249 | $269–$399 |
+| Accessories | $9–$39 | $49–$79 | $89–$179 |
+| AI Gadgets | $199–$499 | $549–$1,199 | $1,499–$2,999 |
+
+If a product goes out of stock, the product page shows the next restock
+date (typically within 5–7 days). You can also tap **Notify me** to get
+an email + push the moment it's back.
+
+---
+
+## Pricing & money
+
+### Currency
+
+- Prices are displayed and charged in **US Dollars (USD)** by default.
+- The storefront detects your region from the IP and shows
+  reference-only local-currency conversions on every product page (e.g.
+  "≈ ₹1,04,500").
+- Your bank converts USD → local currency at the rate effective on the
+  day the charge posts. A foreign-transaction fee may apply depending on
+  your card issuer (typically 0–3%).
+- VAT / GST is calculated at checkout based on the shipping address and
+  shown as a separate line before the **Place order** button.
+
+### Tax
+
+| Region | Tax | Inclusion |
+|---|---|---|
+| United States | State + local sales tax | Added at checkout (varies 0–9%) |
+| United Kingdom | 20% VAT | Included in displayed prices |
+| European Union | 17–27% VAT (per country) | Included in displayed prices |
+| India | 18% GST | Added at checkout |
+| United Arab Emirates | 5% VAT | Added at checkout |
+| Singapore | 9% GST | Added at checkout |
+| Australia | 10% GST | Added at checkout |
+| Other countries | Local duties + taxes | Paid on delivery (DAP) |
+
+### Member-tier pricing
+
+Membership is automatic — see the Account & loyalty section. Discounts
+apply at checkout, never on the displayed sticker price.
+
+| Tier | Orders (24m) | Discount on full-price items | Loyalty points earned |
+|---|---|---|---|
+| Silver | 0–4 | — | 1 pt per $1 |
+| Gold | 5–19 | 5% off (auto-applied) | 1.05 pts per $1 |
+| Platinum | 20+ | 10% off (auto-applied) | 1.10 pts per $1 |
+
+**100 loyalty points = $1** in store credit, redeemable at checkout.
+Points expire 24 months after they're earned if unused.
+
+### Shipping fees
+
+Repeated here for completeness — full details are in the Shipping
+section.
+
+| Method | Cost | Speed |
+|---|---|---|
+| Standard | **Free** over $50 order subtotal — otherwise **$14** | 3–5 business days |
+| Express | **$14** flat | 1–2 business days |
+| Same-day | **$29** flat | Within 4 hours (metro: US, UK, IN, UAE, SG) |
+| International (outside coverage) | Quoted at checkout | 7–14 business days |
+
+Heavy or oversized items (gaming consoles, large monitors) carry a
+**$10 oversize handling** surcharge for international Express shipments.
+Standard/Same-day are unaffected.
+
+### Discounts and promotions
+
+- **Welcome offer:** subscribe to the newsletter (Insiders only) and
+  get **10% off your first order** (max discount $150, excludes Apple
+  hardware).
+- **Refer a friend:** $20 store credit for each friend who places an
+  order of $100+; they get $20 off too.
+- **Flash deals:** rotating limited-stock discounts featured on the
+  homepage and `/shop?sale=1`. Discount stacks with member-tier discount
+  unless noted.
+- **Bundles:** save 5–15% by adding compatible items to your cart
+  (e.g. iPhone + AirPods, MacBook + USB-C hub). Detected automatically
+  by NexCart Intelligence™ at checkout.
+- **Student / educator pricing:** 10% off laptops, tablets and
+  accessories. Verify with [UNiDAYS / SheerID] on your account page.
+
+Member-tier discount does **not** stack on already-discounted (SALE-
+badged) items.
+
+### Price match
+
+We monitor competitor pricing daily and aim to be within 1% of the
+best authorised-retailer price.
+
+- If you find a verifiable lower price on the **same SKU** from an
+  **authorised seller** within **14 days of purchase**, email
+  match@nexcart.app with the receipt and link.
+- We credit you the difference as store credit (faster) or refund to
+  your original payment method (3–5 business days).
+- Marketplace listings, used items, and grey imports do not qualify.
+
+### Bulk and B2B
+
+Volume discounts on orders of 10+ identical units:
+
+| Quantity | Discount off list |
+|---|---|
+| 10–24 units | 3% |
+| 25–49 units | 5% |
+| 50–99 units | 8% |
+| 100+ units | Custom quote — email business@nexcart.app |
+
+Verified businesses can request **Net-30 invoicing** instead of paying
+upfront. Accounts spending $25k+/year get a dedicated account manager.
+
+### Gift cards
+
+| Denomination | Format |
+|---|---|
+| $25 / $50 / $100 / $200 / $500 | Digital, emailed within 5 minutes |
+
+- Never expire.
+- Stackable with member-tier discount and points.
+- Non-refundable, non-transferable (gifting OK).
+- Cannot be used to buy other gift cards.
+
+### Refund mechanics
+
+Repeated here for clarity — full policy under Returns & refunds.
+
+- **Card refunds** post in 3–5 business days from when we receive the
+  return; your bank may take an additional 2–3 days.
+- **Store-credit refunds** are instant and don't expire.
+- **Gift purchases** can be refunded to the original buyer, or to a
+  store-credit balance the gift recipient keeps.
+
+### Trade-in
+
+Trade in old devices and apply the credit to your next order.
+
+| Device | Indicative credit |
+|---|---|
+| iPhone (last 3 generations, working) | $80–$540 |
+| MacBook (post-2020) | $200–$1,200 |
+| AirPods Pro (any) | $25–$60 |
+| Apple Watch (post-Series 6) | $40–$220 |
+| Samsung Galaxy S (post-S20) | $60–$420 |
+
+Final offer is given after you submit a 60-second device condition
+check on your account page. Pickup is free worldwide.
 
 ---
 
