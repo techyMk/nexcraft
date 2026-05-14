@@ -224,7 +224,7 @@ export function EditProfileModal({
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading}
                     aria-label="Change avatar"
-                    className="group relative inline-flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-brand text-lg font-semibold shadow-glow ring-2 ring-white/10 transition hover:ring-white/30 disabled:cursor-wait"
+                    className="group relative inline-flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-brand text-lg font-semibold shadow-glow ring-2 ring-white/10 transition hover:ring-white/30 disabled:cursor-wait"
                   >
                     {avatarUrl ? (
                       <Image
