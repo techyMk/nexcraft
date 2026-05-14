@@ -14,9 +14,11 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { useAuth } from "@/components/auth-provider";
+import { createClient } from "@/lib/supabase/client";
 
 type Role = "user" | "assistant";
 type Message = {
@@ -39,15 +41,76 @@ function uid() {
 
 export function AIAssistantFab() {
   const pathname = usePathname();
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [profileAvatar, setProfileAvatar] = useState<string | null>(null);
+  const [profileName, setProfileName] = useState<string | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    if (!user) {
+      setProfileAvatar(null);
+      setProfileName(null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from("profiles")
+          .select("full_name, avatar_url")
+          .eq("id", user.id)
+          .maybeSingle();
+        if (cancelled) return;
+        setProfileAvatar(
+          data?.avatar_url ??
+            (user.user_metadata?.avatar_url as string | undefined) ??
+            null,
+        );
+        setProfileName(
+          data?.full_name ??
+            (user.user_metadata?.full_name as string | undefined) ??
+            user.email ??
+            null,
+        );
+      } catch {
+        if (!cancelled) {
+          setProfileAvatar(
+            (user.user_metadata?.avatar_url as string | undefined) ?? null,
+          );
+          setProfileName(
+            (user.user_metadata?.full_name as string | undefined) ??
+              user.email ??
+              null,
+          );
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
+  const userInitials = useMemo(() => {
+    const source = profileName ?? user?.email ?? "";
+    return (
+      source
+        .split(/[\s@._-]+/)
+        .filter(Boolean)
+        .map((p) => p[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase() || "·"
+    );
+  }, [profileName, user?.email]);
 
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 60);
@@ -308,22 +371,37 @@ export function AIAssistantFab() {
                       <div
                         className={
                           m.role === "user"
-                            ? "rounded-2xl rounded-br-md bg-gradient-brand px-3 py-2 text-sm text-white"
-                            : "rounded-2xl rounded-bl-md bg-white/[0.04] px-3 py-2 text-sm text-text"
+                            ? "flex items-end justify-end gap-2"
+                            : ""
                         }
                       >
-                        {m.content ? (
-                          m.role === "assistant" ? (
-                            <ChatMarkdown content={m.content} />
+                        <div
+                          className={
+                            m.role === "user"
+                              ? "rounded-2xl rounded-br-md bg-gradient-brand px-3 py-2 text-sm text-white"
+                              : "rounded-2xl rounded-bl-md bg-white/[0.04] px-3 py-2 text-sm text-text"
+                          }
+                        >
+                          {m.content ? (
+                            m.role === "assistant" ? (
+                              <ChatMarkdown content={m.content} />
+                            ) : (
+                              <span className="whitespace-pre-wrap">{m.content}</span>
+                            )
                           ) : (
-                            <span className="whitespace-pre-wrap">{m.content}</span>
-                          )
-                        ) : (
-                          <span className="inline-flex gap-1 align-middle">
-                            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400" />
-                            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400 [animation-delay:0.15s]" />
-                            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400 [animation-delay:0.3s]" />
-                          </span>
+                            <span className="inline-flex gap-1 align-middle">
+                              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400" />
+                              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400 [animation-delay:0.15s]" />
+                              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400 [animation-delay:0.3s]" />
+                            </span>
+                          )}
+                        </div>
+                        {m.role === "user" && (
+                          <UserAvatar
+                            src={profileAvatar}
+                            initials={userInitials}
+                            name={profileName ?? "You"}
+                          />
                         )}
                       </div>
                       {m.content && (
@@ -511,6 +589,38 @@ function IconAction({
     >
       {children}
     </button>
+  );
+}
+
+function UserAvatar({
+  src,
+  initials,
+  name,
+}: {
+  src: string | null;
+  initials: string;
+  name: string;
+}) {
+  return (
+    <span
+      title={name}
+      aria-label={name}
+      className="relative inline-flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-brand text-[10px] font-semibold text-white ring-1 ring-white/20"
+    >
+      {src ? (
+        <Image
+          src={src}
+          alt=""
+          width={56}
+          height={56}
+          unoptimized
+          referrerPolicy="no-referrer"
+          className="h-full w-full rounded-full object-cover"
+        />
+      ) : (
+        <span>{initials}</span>
+      )}
+    </span>
   );
 }
 

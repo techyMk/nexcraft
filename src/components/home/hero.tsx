@@ -153,7 +153,7 @@ function HeroVisual() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8, duration: 0.6 }}
-        className="absolute -right-2 top-32 w-56 rounded-2xl border border-white/[0.08] bg-surface/80 p-3 shadow-card backdrop-blur-xl md:-right-8 md:top-40"
+        className="absolute -right-4 bottom-10 w-56 rounded-2xl border border-white/[0.08] bg-surface/80 p-3 shadow-card backdrop-blur-xl md:-right-10 md:bottom-14"
       >
         <div className="flex items-center gap-3">
           <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/30">
@@ -167,30 +167,6 @@ function HeroVisual() {
               Delivery
             </div>
           </div>
-        </div>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 24, x: "-50%" }}
-        animate={{ opacity: 1, y: 0, x: "-50%" }}
-        transition={{ delay: 1, duration: 0.6 }}
-        className="absolute -bottom-4 left-1/2 w-60 rounded-2xl border border-white/[0.08] bg-surface/80 p-3 shadow-card backdrop-blur-xl"
-      >
-        <div className="text-[11px] uppercase tracking-widest text-text-2">
-          Today&apos;s revenue
-        </div>
-        <div className="mt-1 flex items-baseline justify-between">
-          <span className="font-display text-2xl font-semibold">$248,420</span>
-          <span className="text-xs font-semibold text-emerald-400">+12.4%</span>
-        </div>
-        <div className="mt-2 flex h-7 items-end gap-1">
-          {[40, 65, 35, 70, 55, 85, 60, 95, 75, 90, 65, 100].map((h, i) => (
-            <div
-              key={i}
-              className="flex-1 rounded-sm bg-gradient-to-t from-primary-600 to-accent-purple"
-              style={{ height: `${h}%` }}
-            />
-          ))}
         </div>
       </motion.div>
     </motion.div>
