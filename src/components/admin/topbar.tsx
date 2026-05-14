@@ -1,9 +1,43 @@
-"use client";
-
 import Image from "next/image";
+import Link from "next/link";
 import { Bell, Search, Sparkles } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
 
-export function AdminTopbar() {
+function initials(name: string) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+}
+
+export async function AdminTopbar() {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let avatarUrl: string | null = null;
+  let fullName = "Admin";
+  let email = "";
+
+  if (user) {
+    email = user.email ?? "";
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("full_name, avatar_url")
+      .eq("id", user.id)
+      .maybeSingle();
+    avatarUrl =
+      profile?.avatar_url ??
+      (user.user_metadata?.avatar_url as string | undefined) ??
+      null;
+    fullName =
+      profile?.full_name ?? user.email?.split("@")[0] ?? "Admin";
+  }
+
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b border-white/[0.06] bg-surface/60 px-6 backdrop-blur-xl md:px-8">
       <div className="flex flex-1 items-center gap-3">
@@ -29,14 +63,26 @@ export function AdminTopbar() {
           <Bell size={15} />
           <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-gradient-brand" />
         </button>
-        <span className="relative inline-block h-9 w-9 overflow-hidden rounded-full ring-1 ring-white/10">
-          <Image
-            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&q=80"
-            alt=""
-            width={36}
-            height={36}
-          />
-        </span>
+        <Link
+          href="/account"
+          aria-label={fullName ? `${fullName}'s account` : "Account"}
+          title={email || fullName}
+          className="relative inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-gradient-brand text-xs font-semibold ring-1 ring-white/10 transition hover:ring-white/20"
+        >
+          {avatarUrl ? (
+            <Image
+              src={avatarUrl}
+              alt={fullName}
+              width={36}
+              height={36}
+              className="h-full w-full object-cover"
+              referrerPolicy="no-referrer"
+              unoptimized
+            />
+          ) : (
+            <span className="text-white">{initials(fullName) || "·"}</span>
+          )}
+        </Link>
       </div>
     </header>
   );

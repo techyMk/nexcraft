@@ -239,7 +239,7 @@ export function AIAssistantFab() {
                 </div>
                 <div className="flex-1">
                   <div className="font-display text-base font-semibold">
-                    NexCart Intelligence™
+                    NexCart Intelligence
                   </div>
                   <div className="text-xs text-text-2">
                     {streaming ? "Thinking…" : "Ask me anything about NexCart."}
@@ -356,9 +356,6 @@ export function AIAssistantFab() {
                   )}
                 </button>
               </form>
-              <div className="mt-2 text-center text-[10px] uppercase tracking-widest text-text-2">
-                Powered by NexCart Intelligence™ · Groq + pgvector
-              </div>
             </div>
           </motion.div>
         )}
