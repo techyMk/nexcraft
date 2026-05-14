@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Mail } from "lucide-react";
+import { NewsletterForm } from "@/components/newsletter-form";
 
 export function Newsletter() {
   return (
@@ -28,17 +29,7 @@ export function Newsletter() {
               Subscribe to receive private drops, intelligent recommendations
               and 10% off your first order.
             </p>
-            <form className="mx-auto mt-8 flex max-w-lg overflow-hidden rounded-full border border-white/[0.08] bg-bg/60 p-1.5 backdrop-blur-xl">
-              <input
-                type="email"
-                required
-                placeholder="Enter your email"
-                className="flex-1 bg-transparent px-4 text-sm outline-none placeholder:text-text-2"
-              />
-              <button className="rounded-full bg-gradient-brand px-5 py-2 text-sm font-medium text-white shadow-glow">
-                Subscribe
-              </button>
-            </form>
+            <NewsletterForm variant="hero" source="home_section" />
             <div className="mt-4 text-xs text-text-2">
               No spam. Unsubscribe anytime. Trusted by 50k+ subscribers.
             </div>

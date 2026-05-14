@@ -7,10 +7,14 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
+  Headphones,
   Heart,
   Menu,
+  RotateCcw,
   Search,
+  ShieldCheck,
   ShoppingBag,
+  Truck,
   User,
   X,
 } from "lucide-react";
@@ -124,6 +128,7 @@ export function Navbar() {
         scrolled || menu ? "bg-bg/85 backdrop-blur-xl" : "bg-transparent",
       )}
     >
+      <TrustRow collapsed={scrolled || menu} />
       <div className="container flex h-16 items-center justify-between gap-2 sm:gap-4 md:h-24 md:gap-6">
         <Link
           href="/"
@@ -371,5 +376,40 @@ export function Navbar() {
         )}
       </AnimatePresence>
     </header>
+  );
+}
+
+const trustItems = [
+  { Icon: Truck, label: "Free delivery over $50" },
+  { Icon: RotateCcw, label: "7-day returns" },
+  { Icon: ShieldCheck, label: "2-year warranty" },
+  { Icon: Headphones, label: "24/7 support" },
+];
+
+function TrustRow({ collapsed }: { collapsed: boolean }) {
+  return (
+    <div
+      aria-hidden={collapsed}
+      className={cn(
+        "overflow-hidden border-b border-white/[0.04] bg-gradient-to-r from-primary-900/30 via-accent-purple/20 to-primary-900/30 backdrop-blur-xl transition-[max-height,opacity] duration-300 ease-out",
+        collapsed ? "max-h-0 opacity-0" : "max-h-10 opacity-100",
+      )}
+    >
+      <div className="container flex h-8 items-center justify-center gap-x-6 gap-y-1 overflow-hidden text-[11px] text-text-2 sm:gap-x-8">
+        {trustItems.map(({ Icon, label }, i) => (
+          <span
+            key={label}
+            className={cn(
+              "inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap",
+              i > 0 && "hidden sm:inline-flex",
+              i > 1 && "sm:hidden md:inline-flex",
+            )}
+          >
+            <Icon size={12} className="text-primary-300" />
+            <span>{label}</span>
+          </span>
+        ))}
+      </div>
+    </div>
   );
 }

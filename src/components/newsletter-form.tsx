@@ -1,0 +1,122 @@
+"use client";
+
+import { useState } from "react";
+import { Check, Loader2, Send } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+type Variant = "hero" | "footer";
+
+export function NewsletterForm({
+  variant,
+  source,
+}: {
+  variant: Variant;
+  source: "footer" | "home_section";
+}) {
+  const [email, setEmail] = useState("");
+  const [state, setState] = useState<"idle" | "loading" | "done" | "error">(
+    "idle",
+  );
+  const [error, setError] = useState<string | null>(null);
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (state === "loading" || state === "done") return;
+
+    setState("loading");
+    setError(null);
+
+    try {
+      const res = await fetch("/api/newsletter/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, source }),
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        ok?: boolean;
+        error?: string;
+      };
+      if (!res.ok || !data.ok) {
+        setState("error");
+        setError(data.error ?? "Something went wrong. Please try again.");
+        return;
+      }
+      setState("done");
+    } catch {
+      setState("error");
+      setError("Network error. Please try again.");
+    }
+  }
+
+  const isHero = variant === "hero";
+
+  return (
+    <div>
+      <form
+        onSubmit={onSubmit}
+        className={cn(
+          "flex overflow-hidden rounded-full border border-white/[0.08] backdrop-blur-xl",
+          isHero
+            ? "mx-auto mt-8 max-w-lg bg-bg/60 p-1.5"
+            : "mt-6 max-w-sm bg-white/[0.03] p-1",
+        )}
+      >
+        <input
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          disabled={state === "loading" || state === "done"}
+          placeholder={isHero ? "Enter your email" : "you@email.com"}
+          className="flex-1 bg-transparent px-4 text-sm outline-none placeholder:text-text-2 disabled:opacity-60"
+          aria-label="Email"
+        />
+        <button
+          type="submit"
+          disabled={state === "loading" || state === "done"}
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded-full font-medium text-white shadow-glow transition disabled:cursor-not-allowed disabled:opacity-80",
+            isHero
+              ? "bg-gradient-brand px-5 py-2 text-sm"
+              : "bg-gradient-brand px-4 py-2 text-sm",
+          )}
+        >
+          {state === "loading" ? (
+            <>
+              <Loader2 size={14} className="animate-spin" /> Subscribing…
+            </>
+          ) : state === "done" ? (
+            <>
+              <Check size={14} /> Subscribed
+            </>
+          ) : (
+            <>
+              {isHero ? "Subscribe" : "Subscribe"}
+              {isHero && <Send size={13} />}
+            </>
+          )}
+        </button>
+      </form>
+      {state === "done" && (
+        <div
+          className={cn(
+            "text-xs text-emerald-300",
+            isHero ? "mt-3 text-center" : "mt-2",
+          )}
+        >
+          You&apos;re on the list — check your inbox for a welcome note.
+        </div>
+      )}
+      {state === "error" && error && (
+        <div
+          className={cn(
+            "text-xs text-rose-300",
+            isHero ? "mt-3 text-center" : "mt-2",
+          )}
+        >
+          {error}
+        </div>
+      )}
+    </div>
+  );
+}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Twitter, Github, Instagram, Linkedin } from "lucide-react";
+import { NewsletterForm } from "@/components/newsletter-form";
 
 const cols = [
   {
@@ -64,16 +65,7 @@ export function Footer() {
               Intelligent commerce, engineered for the next decade. AI-curated
               products, lightning checkout, premium service worldwide.
             </p>
-            <form className="mt-6 flex max-w-sm overflow-hidden rounded-full border border-white/[0.08] bg-white/[0.03] p-1">
-              <input
-                type="email"
-                placeholder="you@email.com"
-                className="flex-1 bg-transparent px-4 text-sm outline-none placeholder:text-text-2"
-              />
-              <button className="rounded-full bg-gradient-brand px-4 py-2 text-sm font-medium text-white shadow-glow">
-                Subscribe
-              </button>
-            </form>
+            <NewsletterForm variant="footer" source="footer" />
             <div className="mt-6 flex items-center gap-2 text-text-2">
               {[Twitter, Instagram, Github, Linkedin].map((I, i) => (
                 <a

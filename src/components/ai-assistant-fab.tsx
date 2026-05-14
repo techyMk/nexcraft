@@ -278,7 +278,7 @@ export function AIAssistantFab() {
         transition={{ delay: 0.6, type: "spring", stiffness: 280 }}
         whileHover={{ scale: 1.05 }}
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-6 right-6 z-[60] inline-flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-gradient-brand text-white shadow-glow ring-1 ring-white/20"
+        className="fixed bottom-20 right-4 z-[60] inline-flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-gradient-brand text-white shadow-glow ring-1 ring-white/20 md:bottom-6 md:right-6"
         aria-label={open ? "Close AI assistant" : "Open AI assistant"}
       >
         <span className="absolute inset-0 -z-10 animate-pulse-slow rounded-full bg-gradient-brand opacity-50 blur-xl" />
@@ -303,7 +303,7 @@ export function AIAssistantFab() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 360, damping: 32 }}
-            className="fixed bottom-24 right-3 z-[60] flex h-[70vh] w-[94vw] max-w-sm flex-col overflow-hidden rounded-3xl border border-white/[0.08] bg-surface/95 shadow-card backdrop-blur-2xl sm:right-6"
+            className="fixed bottom-[8.5rem] right-3 z-[60] flex h-[70vh] w-[94vw] max-w-sm flex-col overflow-hidden rounded-3xl border border-white/[0.08] bg-surface/95 shadow-card backdrop-blur-2xl sm:right-6 md:bottom-24"
           >
             <div className="relative border-b border-white/[0.06] p-5">
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-400/40 to-transparent" />

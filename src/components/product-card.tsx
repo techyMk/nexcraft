@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Heart, Plus, Star, Sparkles } from "lucide-react";
+import { Heart, Plus, Star, Sparkles, Truck } from "lucide-react";
 import { type Product } from "@/lib/data";
 import { formatPrice, cn } from "@/lib/utils";
 import { useCart } from "@/store/cart";
@@ -150,6 +150,30 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
               {formatPrice(product.oldPrice)}
             </span>
           )}
+        </div>
+        <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-text-2">
+          {product.stock > 0 ? (
+            product.stock <= 5 ? (
+              <span className="inline-flex items-center gap-1 text-amber-300">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-300" />
+                Only {product.stock} left
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 text-emerald-300">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                In stock
+              </span>
+            )
+          ) : (
+            <span className="inline-flex items-center gap-1 text-rose-300">
+              <span className="h-1.5 w-1.5 rounded-full bg-rose-400" />
+              Sold out
+            </span>
+          )}
+          <span className="inline-flex items-center gap-1">
+            <Truck size={11} className="opacity-70" />
+            Free delivery
+          </span>
         </div>
       </div>
     </motion.div>

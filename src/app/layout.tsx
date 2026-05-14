@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
+import { MobileTabBar } from "@/components/mobile-tabbar";
 import { Footer } from "@/components/footer";
 import { CartDrawer } from "@/components/cart-drawer";
 import { AnimatedBg } from "@/components/animated-bg";
@@ -54,7 +55,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${space.variable}`}>
-      <body className="relative overflow-x-hidden bg-bg text-text">
+      <body className="relative overflow-x-hidden bg-bg pb-14 text-text md:pb-0">
         <AuthProvider>
           <AnimatedBg />
           <Navbar />
@@ -65,6 +66,7 @@ export default function RootLayout({
           <CommandPalette />
           <AuthGateModal />
           <AIAssistantFab />
+          <MobileTabBar />
         </AuthProvider>
       </body>
     </html>
