@@ -8,6 +8,8 @@ import { type Product } from "@/lib/data";
 import { formatPrice, cn } from "@/lib/utils";
 import { useCart } from "@/store/cart";
 import { useWishlist } from "@/store/wishlist";
+import { useAuth } from "@/components/auth-provider";
+import { useAuthGate } from "@/store/auth-gate";
 
 const badgeStyles: Record<string, string> = {
   HOT: "bg-orange-500/15 text-orange-300 ring-orange-500/30",
@@ -20,6 +22,8 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
   const add = useCart((s) => s.add);
   const wishlisted = useWishlist((s) => s.items.some((i) => i.id === product.id));
   const toggleWishlist = useWishlist((s) => s.toggle);
+  const { user } = useAuth();
+  const openGate = useAuthGate((s) => s.openGate);
 
   return (
     <motion.div
@@ -67,6 +71,15 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
           aria-pressed={wishlisted}
           onClick={(e) => {
             e.preventDefault();
+            if (!user) {
+              openGate({
+                title: "Sign in to save items",
+                description:
+                  "Sign in to save products to your wishlist — synced across devices and ready when you come back.",
+                intent: "wishlist",
+              });
+              return;
+            }
             toggleWishlist({
               id: product.id,
               slug: product.slug,
@@ -90,6 +103,15 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
         <button
           onClick={(e) => {
             e.preventDefault();
+            if (!user) {
+              openGate({
+                title: "Sign in to add to cart",
+                description:
+                  "Sign in to start your bag — we'll keep it across devices and have it ready at checkout.",
+                intent: "cart",
+              });
+              return;
+            }
             add({
               id: product.id,
               slug: product.slug,

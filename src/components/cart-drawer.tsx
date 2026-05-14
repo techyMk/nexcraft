@@ -4,12 +4,18 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, Trash2, X, ArrowRight, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useCart } from "@/store/cart";
 import { formatPrice } from "@/lib/utils";
+import { useAuth } from "@/components/auth-provider";
+import { useAuthGate } from "@/store/auth-gate";
 
 export function CartDrawer() {
+  const router = useRouter();
   const { open, closeCart, lines, setQty, remove } = useCart();
+  const { user } = useAuth();
+  const openGate = useAuthGate((s) => s.openGate);
   const subtotal = lines.reduce((a, l) => a + l.price * l.quantity, 0);
   const shippingFree = 500;
   const progress = Math.min(100, (subtotal / shippingFree) * 100);
@@ -165,13 +171,26 @@ export function CartDrawer() {
                 <div className="mb-4 text-xs text-text-2">
                   Taxes and shipping calculated at checkout.
                 </div>
-                <Link
-                  href="/checkout"
-                  onClick={closeCart}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!user) {
+                      closeCart();
+                      openGate({
+                        title: "Sign in to checkout",
+                        description:
+                          "Sign in or create a free account to place your order securely.",
+                        intent: "checkout",
+                      });
+                      return;
+                    }
+                    closeCart();
+                    router.push("/checkout");
+                  }}
                   className="btn btn-primary w-full"
                 >
                   Checkout securely <ArrowRight size={16} />
-                </Link>
+                </button>
                 <button
                   onClick={closeCart}
                   className="mt-2 w-full rounded-full py-2 text-sm text-text-2 hover:text-white"

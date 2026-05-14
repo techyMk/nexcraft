@@ -18,6 +18,8 @@ import {
 import { type Product } from "@/lib/data";
 import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/store/cart";
+import { useAuth } from "@/components/auth-provider";
+import { useAuthGate } from "@/store/auth-gate";
 import { ProductCard } from "@/components/product-card";
 
 export function ProductDetail({
@@ -32,6 +34,8 @@ export function ProductDetail({
   const [color, setColor] = useState(product.colors?.[0]?.name);
   const [tab, setTab] = useState<"overview" | "specs" | "reviews">("overview");
   const add = useCart((s) => s.add);
+  const { user } = useAuth();
+  const openGate = useAuthGate((s) => s.openGate);
 
   return (
     <div className="pt-24 md:pt-28">
@@ -187,7 +191,16 @@ export function ProductDetail({
                 </button>
               </div>
               <button
-                onClick={() =>
+                onClick={() => {
+                  if (!user) {
+                    openGate({
+                      title: "Sign in to add to cart",
+                      description:
+                        "Sign in to start your bag — we'll keep it across devices and have it ready at checkout.",
+                      intent: "cart",
+                    });
+                    return;
+                  }
                   add(
                     {
                       id: product.id,
@@ -197,8 +210,8 @@ export function ProductDetail({
                       image: product.images[0],
                     },
                     qty,
-                  )
-                }
+                  );
+                }}
                 className="btn btn-primary flex-1 min-w-[200px]"
               >
                 <Sparkles size={14} /> Add to cart · {formatPrice(product.price * qty)}

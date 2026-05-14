@@ -8,6 +8,8 @@ import { AnimatedBg } from "@/components/animated-bg";
 import { AIAssistantFab } from "@/components/ai-assistant-fab";
 import { CommandPalette } from "@/components/command-palette";
 import { ScrollProgress } from "@/components/scroll-progress";
+import { AuthProvider } from "@/components/auth-provider";
+import { AuthGateModal } from "@/components/auth-gate-modal";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -53,14 +55,17 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${space.variable}`}>
       <body className="relative overflow-x-hidden bg-bg text-text">
-        <AnimatedBg />
-        <Navbar />
-        <ScrollProgress />
-        <main className="relative z-10">{children}</main>
-        <Footer />
-        <CartDrawer />
-        <CommandPalette />
-        <AIAssistantFab />
+        <AuthProvider>
+          <AnimatedBg />
+          <Navbar />
+          <ScrollProgress />
+          <main className="relative z-10">{children}</main>
+          <Footer />
+          <CartDrawer />
+          <CommandPalette />
+          <AuthGateModal />
+          <AIAssistantFab />
+        </AuthProvider>
       </body>
     </html>
   );
