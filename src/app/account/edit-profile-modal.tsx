@@ -4,16 +4,20 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertTriangle,
   Check,
-  Eraser,
   Loader2,
   Pencil,
+  Trash2,
   Upload,
   X,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { createClient } from "@/lib/supabase/client";
 import { updateProfileAction } from "./actions";
+
+const MAX_AVATAR_BYTES = 5 * 1024 * 1024;
+const ACCEPT = "image/png,image/jpeg,image/webp,image/gif";
 
 function initials(name: string) {
   return name
@@ -40,8 +44,10 @@ export function EditProfileModal({
   const [pending, startTransition] = useTransition();
   const [fullName, setFullName] = useState(initialFullName);
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl ?? "");
+  const [uploading, setUploading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Reset on open
   useEffect(() => {
@@ -53,7 +59,7 @@ export function EditProfileModal({
     }
   }, [open, initialFullName, initialAvatarUrl]);
 
-  // Lock body scroll while open
+  // Lock body scroll
   useEffect(() => {
     if (typeof document === "undefined") return;
     document.body.style.overflow = open ? "hidden" : "";
@@ -62,15 +68,84 @@ export function EditProfileModal({
     };
   }, [open]);
 
-  // Escape to close
+  // Escape closes
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !pending) onClose();
+      if (e.key === "Escape" && !pending && !uploading) onClose();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, pending, onClose]);
+  }, [open, pending, uploading, onClose]);
+
+  async function onFilePick(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    // Reset input so the same file can be picked again later
+    e.target.value = "";
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setErr("Please pick an image (PNG, JPG, WebP, or GIF).");
+      return;
+    }
+    if (file.size > MAX_AVATAR_BYTES) {
+      setErr(
+        `Image is over ${Math.round(MAX_AVATAR_BYTES / 1024 / 1024)} MB. Please pick a smaller file.`,
+      );
+      return;
+    }
+
+    setErr(null);
+    setUploading(true);
+
+    try {
+      const supabase = createClient();
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+      if (authError || !user) {
+        throw new Error("You need to be signed in to upload an avatar.");
+      }
+
+      const ext =
+        (file.name.split(".").pop() ?? "png").toLowerCase().replace(/[^a-z0-9]/g, "") ||
+        "png";
+      const path = `${user.id}/${Date.now()}.${ext}`;
+
+      const { error: uploadErr } = await supabase.storage
+        .from("avatars")
+        .upload(path, file, {
+          contentType: file.type,
+          upsert: false,
+          cacheControl: "3600",
+        });
+
+      if (uploadErr) {
+        if (/bucket .* not found|bucket not found/i.test(uploadErr.message)) {
+          throw new Error(
+            "Avatars bucket is missing — run supabase/migrations/008_avatars_bucket.sql in the Supabase SQL Editor.",
+          );
+        }
+        throw new Error(uploadErr.message);
+      }
+
+      const { data: urlData } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(path);
+
+      // Cache-bust on update so the new image shows immediately
+      setAvatarUrl(`${urlData.publicUrl}?v=${Date.now()}`);
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function onRemoveAvatar() {
+    setAvatarUrl("");
+  }
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -91,6 +166,8 @@ export function EditProfileModal({
     fullName.trim() !== initialFullName.trim() ||
     avatarUrl.trim() !== (initialAvatarUrl ?? "").trim();
 
+  const busy = pending || uploading;
+
   return (
     <AnimatePresence>
       {open && (
@@ -99,7 +176,7 @@ export function EditProfileModal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => !pending && onClose()}
+            onClick={() => !busy && onClose()}
             aria-label="Close"
             className="absolute inset-0 cursor-default bg-bg/70 backdrop-blur-md"
           />
@@ -131,7 +208,7 @@ export function EditProfileModal({
                 </div>
                 <button
                   type="button"
-                  onClick={() => !pending && onClose()}
+                  onClick={() => !busy && onClose()}
                   className="inline-flex h-8 w-8 items-center justify-center rounded-full text-text-2 hover:bg-white/[0.05] hover:text-white"
                   aria-label="Close"
                 >
@@ -140,9 +217,15 @@ export function EditProfileModal({
               </div>
 
               <form onSubmit={onSubmit} className="relative space-y-5 p-6">
-                {/* Hero avatar */}
-                <div className="flex flex-col items-center gap-3 pt-1 pb-1 sm:flex-row sm:items-center sm:gap-5">
-                  <span className="relative inline-flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-brand text-lg font-semibold ring-2 ring-white/10 shadow-glow">
+                {/* Avatar + upload controls */}
+                <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:gap-5">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                    aria-label="Change avatar"
+                    className="group relative inline-flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-brand text-lg font-semibold shadow-glow ring-2 ring-white/10 transition hover:ring-white/30 disabled:cursor-wait"
+                  >
                     {avatarUrl ? (
                       <Image
                         key={avatarUrl}
@@ -159,15 +242,58 @@ export function EditProfileModal({
                         {initials(fullName) || "·"}
                       </span>
                     )}
-                  </span>
-                  <div className="text-center text-xs text-text-2 sm:text-left">
-                    <div className="text-sm text-text">Avatar</div>
-                    <div className="mt-0.5">
-                      Paste any public image URL below, or leave blank to use
-                      your initials.
+                    {/* Hover hint — change/upload */}
+                    <span className="absolute inset-0 grid place-items-center bg-bg/60 opacity-0 backdrop-blur-sm transition group-hover:opacity-100">
+                      <Upload size={16} className="text-white" />
+                    </span>
+                    {/* Hard loading overlay */}
+                    {uploading && (
+                      <span className="absolute inset-0 grid place-items-center bg-bg/70 backdrop-blur-sm">
+                        <Loader2 size={18} className="animate-spin text-white" />
+                      </span>
+                    )}
+                  </button>
+
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept={ACCEPT}
+                    onChange={onFilePick}
+                    className="hidden"
+                  />
+
+                  <div className="flex-1 text-center sm:text-left">
+                    <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploading}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs hover:bg-white/[0.07] disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {uploading ? (
+                          <Loader2 size={12} className="animate-spin" />
+                        ) : (
+                          <Upload size={12} />
+                        )}
+                        {uploading
+                          ? "Uploading…"
+                          : avatarUrl
+                            ? "Change photo"
+                            : "Upload photo"}
+                      </button>
+                      {avatarUrl && (
+                        <button
+                          type="button"
+                          onClick={onRemoveAvatar}
+                          disabled={uploading}
+                          className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs text-text-2 hover:bg-white/[0.07] hover:text-rose-300 disabled:opacity-60"
+                        >
+                          <Trash2 size={12} /> Remove
+                        </button>
+                      )}
                     </div>
-                    <div className="mt-1 text-[11px] text-text-2/80">
-                      File uploads via Supabase Storage land in the next migration.
+                    <div className="mt-2 text-[11px] text-text-2">
+                      PNG, JPG, WebP, GIF · up to 5 MB
                     </div>
                   </div>
                 </div>
@@ -186,39 +312,6 @@ export function EditProfileModal({
                   />
                 </label>
 
-                <label className="block">
-                  <div className="mb-1.5 flex items-center justify-between">
-                    <span className="text-xs uppercase tracking-widest text-text-2">
-                      Avatar URL
-                    </span>
-                    {avatarUrl && (
-                      <button
-                        type="button"
-                        onClick={() => setAvatarUrl("")}
-                        className="inline-flex items-center gap-1 text-[11px] text-text-2 hover:text-white"
-                      >
-                        <Eraser size={11} /> Clear
-                      </button>
-                    )}
-                  </div>
-                  <input
-                    value={avatarUrl}
-                    onChange={(e) => setAvatarUrl(e.target.value)}
-                    type="url"
-                    placeholder="https://…"
-                    className="w-full truncate rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 text-sm outline-none focus:border-primary-400/60 focus:ring-2 focus:ring-primary-400/20"
-                  />
-                </label>
-
-                <button
-                  type="button"
-                  disabled
-                  title="Coming in the next migration"
-                  className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl border border-dashed border-white/[0.08] bg-white/[0.02] py-2.5 text-xs text-text-2"
-                >
-                  <Upload size={13} /> Upload from device · coming soon
-                </button>
-
                 {err && (
                   <div className="flex items-start gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-200">
                     <AlertTriangle size={14} className="mt-0.5 shrink-0" />
@@ -230,14 +323,14 @@ export function EditProfileModal({
                   <button
                     type="button"
                     onClick={onClose}
-                    disabled={pending}
+                    disabled={busy}
                     className="rounded-full border border-white/[0.08] bg-white/[0.03] px-4 py-2 text-sm text-text-2 hover:text-white disabled:opacity-60"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    disabled={pending || !dirty || saved}
+                    disabled={busy || !dirty || saved}
                     className="btn btn-primary disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {pending ? (
