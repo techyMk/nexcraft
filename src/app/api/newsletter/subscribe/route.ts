@@ -42,11 +42,14 @@ export async function POST(req: Request) {
 
   // Best-effort welcome email. If Resend isn't configured we just skip it;
   // the subscription itself has already succeeded.
+  let emailStatus: "sent" | "skipped" | "failed" = "skipped";
+  let emailDetail: string | undefined;
+
   const resendKey = process.env.RESEND_API_KEY;
-  const from = process.env.RESEND_FROM ?? "NexCart <techymk.dev@gmail.com>";
+  const from = process.env.RESEND_FROM ?? "NexCart <onboarding@resend.dev>";
   if (resendKey) {
     try {
-      await fetch("https://api.resend.com/emails", {
+      const res = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -59,12 +62,22 @@ export async function POST(req: Request) {
           html: welcomeHtml(),
         }),
       });
+      if (res.ok) {
+        emailStatus = "sent";
+      } else {
+        emailStatus = "failed";
+        const body = await res.text();
+        emailDetail = `${res.status} ${body.slice(0, 240)}`;
+        console.warn("[newsletter] resend rejected:", emailDetail);
+      }
     } catch (e) {
-      console.warn("[newsletter] welcome email failed:", e);
+      emailStatus = "failed";
+      emailDetail = e instanceof Error ? e.message : "Network error";
+      console.warn("[newsletter] welcome email failed:", emailDetail);
     }
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, emailStatus, emailDetail });
 }
 
 function welcomeHtml() {

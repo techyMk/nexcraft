@@ -18,6 +18,9 @@ export function NewsletterForm({
     "idle",
   );
   const [error, setError] = useState<string | null>(null);
+  const [emailStatus, setEmailStatus] = useState<
+    "sent" | "skipped" | "failed" | null
+  >(null);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -25,6 +28,7 @@ export function NewsletterForm({
 
     setState("loading");
     setError(null);
+    setEmailStatus(null);
 
     try {
       const res = await fetch("/api/newsletter/subscribe", {
@@ -35,18 +39,25 @@ export function NewsletterForm({
       const data = (await res.json().catch(() => ({}))) as {
         ok?: boolean;
         error?: string;
+        emailStatus?: "sent" | "skipped" | "failed";
       };
       if (!res.ok || !data.ok) {
         setState("error");
         setError(data.error ?? "Something went wrong. Please try again.");
         return;
       }
+      setEmailStatus(data.emailStatus ?? null);
       setState("done");
     } catch {
       setState("error");
       setError("Network error. Please try again.");
     }
   }
+
+  const successMessage =
+    emailStatus === "sent"
+      ? "You're on the list — check your inbox for a welcome note."
+      : "You're on the list. Welcome email is on its way as soon as we're fully cleared with our mail provider.";
 
   const isHero = variant === "hero";
 
@@ -104,7 +115,7 @@ export function NewsletterForm({
             isHero ? "mt-3 text-center" : "mt-2",
           )}
         >
-          You&apos;re on the list — check your inbox for a welcome note.
+          {successMessage}
         </div>
       )}
       {state === "error" && error && (
