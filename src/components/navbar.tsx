@@ -210,22 +210,24 @@ export function Navbar() {
               href="/account"
               aria-label={fullName ? `${fullName}'s account` : "Account"}
               title={fullName ?? user.email ?? "Account"}
-              className="relative inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-gradient-brand text-[11px] font-semibold text-white ring-1 ring-white/15 transition hover:ring-white/30"
+              className="relative inline-block h-9 w-9"
             >
-              {avatarUrl ? (
-                <Image
-                  src={avatarUrl}
-                  alt=""
-                  width={36}
-                  height={36}
-                  unoptimized
-                  referrerPolicy="no-referrer"
-                  className="h-full w-full rounded-full object-cover"
-                />
-              ) : (
-                <span>{initials || "·"}</span>
-              )}
-              <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 ring-2 ring-bg" />
+              <span className="grid h-full w-full place-items-center overflow-hidden rounded-full bg-gradient-brand text-[11px] font-semibold text-white ring-1 ring-white/15 transition hover:ring-white/30">
+                {avatarUrl ? (
+                  <Image
+                    src={avatarUrl}
+                    alt=""
+                    width={36}
+                    height={36}
+                    unoptimized
+                    referrerPolicy="no-referrer"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span>{initials || "·"}</span>
+                )}
+              </span>
+              <span className="pointer-events-none absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 ring-2 ring-bg" />
             </Link>
           ) : (
             <Link
@@ -314,21 +316,23 @@ export function Navbar() {
               >
                 {user ? (
                   <>
-                    <span className="relative inline-flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-brand text-[10px] font-semibold text-white ring-1 ring-white/15">
-                      {avatarUrl ? (
-                        <Image
-                          src={avatarUrl}
-                          alt=""
-                          width={24}
-                          height={24}
-                          unoptimized
-                          referrerPolicy="no-referrer"
-                          className="h-full w-full rounded-full object-cover"
-                        />
-                      ) : (
-                        <span>{initials || "·"}</span>
-                      )}
-                      <span className="absolute -bottom-0.5 -right-0.5 h-1.5 w-1.5 rounded-full bg-emerald-400 ring-2 ring-bg" />
+                    <span className="relative inline-block h-6 w-6 shrink-0">
+                      <span className="grid h-full w-full place-items-center overflow-hidden rounded-full bg-gradient-brand text-[10px] font-semibold text-white ring-1 ring-white/15">
+                        {avatarUrl ? (
+                          <Image
+                            src={avatarUrl}
+                            alt=""
+                            width={24}
+                            height={24}
+                            unoptimized
+                            referrerPolicy="no-referrer"
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <span>{initials || "·"}</span>
+                        )}
+                      </span>
+                      <span className="pointer-events-none absolute -bottom-0.5 -right-0.5 h-1.5 w-1.5 rounded-full bg-emerald-400 ring-2 ring-bg" />
                     </span>
                     <span className="truncate text-white">
                       {fullName ?? user.email}
