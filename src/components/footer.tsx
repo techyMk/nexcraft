@@ -108,11 +108,30 @@ export function Footer() {
           ))}
         </div>
         <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-white/[0.06] pt-6 text-xs text-text-2 md:flex-row md:items-center">
-          <div>© {new Date().getFullYear()} NexCart Inc. All rights reserved.</div>
+          <div className="flex flex-col gap-1">
+            <div>© {new Date().getFullYear()} NexCart Inc. All rights reserved.</div>
+            <div>
+              Designed &amp; developed by{" "}
+              <a
+                href="https://techymk.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-white transition hover:text-primary-300"
+              >
+                techyMk
+              </a>
+            </div>
+          </div>
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-            <Link href="/about">Privacy</Link>
-            <Link href="/about">Terms</Link>
-            <Link href="/about">Security</Link>
+            <Link href="/privacy" className="transition hover:text-white">
+              Privacy
+            </Link>
+            <Link href="/terms" className="transition hover:text-white">
+              Terms
+            </Link>
+            <Link href="/security" className="transition hover:text-white">
+              Security
+            </Link>
             <span className="rounded-full bg-white/[0.04] px-2.5 py-1 text-[10px] uppercase tracking-widest text-text-2">
               Powered by NexCart Intelligence™
             </span>

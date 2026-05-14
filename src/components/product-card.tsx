@@ -12,10 +12,10 @@ import { useAuth } from "@/components/auth-provider";
 import { useAuthGate } from "@/store/auth-gate";
 
 const badgeStyles: Record<string, string> = {
-  HOT: "bg-orange-500/15 text-orange-300 ring-orange-500/30",
-  NEW: "bg-emerald-500/15 text-emerald-300 ring-emerald-500/30",
-  SALE: "bg-rose-500/15 text-rose-300 ring-rose-500/30",
-  "AI PICK": "bg-gradient-brand text-white ring-white/20",
+  HOT: "bg-orange-500 text-white ring-orange-300/40 shadow-md shadow-orange-500/30",
+  NEW: "bg-emerald-500 text-white ring-emerald-300/40 shadow-md shadow-emerald-500/30",
+  SALE: "bg-rose-500 text-white ring-rose-300/40 shadow-md shadow-rose-500/30",
+  "AI PICK": "bg-gradient-brand text-white ring-white/30 shadow-glow",
 };
 
 export function ProductCard({ product, index = 0 }: { product: Product; index?: number }) {

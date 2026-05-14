@@ -4,7 +4,7 @@ import { heroLogos } from "@/lib/data";
 
 export function BrandStrip() {
   return (
-    <section className="relative z-10 pt-12">
+    <section className="relative z-10 pt-16 md:pt-20">
       <div className="container">
         <div className="text-center text-xs uppercase tracking-[0.2em] text-text-2">
           Trusted by the brands you already love
