@@ -20,7 +20,8 @@
       "Bash(awk '/^NEXT_PUBLIC_SUPABASE_URL=/ {print \"Lines containing NEXT_PUBLIC_SUPABASE_URL:\", NR; print \"  raw:\", $0; print \"  length:\", length\\($0\\); print \"  hex of first 60:\", substr\\($0,1,60\\)}' .env.local)",
       "Bash(powershell.exe -NoProfile -Command \"Get-Process node -ErrorAction SilentlyContinue | Select-Object Id, ProcessName, StartTime | Format-Table -AutoSize\")",
       "Bash(node -e \"const sharp=require\\('sharp'\\);sharp\\('assets/bot-icon.png'\\).metadata\\(\\).then\\(m=>console.log\\('src:',m.width,'x',m.height,'channels:',m.channels\\)\\);sharp\\('public/brand/bot-icon.webp'\\).metadata\\(\\).then\\(m=>console.log\\('out:',m.width,'x',m.height\\)\\);\")",
-      "Bash(node -e \"const sharp=require\\('sharp'\\);sharp\\('assets/bot-icon.png'\\).metadata\\(\\).then\\(m=>console.log\\('source:',m.width,'×',m.height,'channels:',m.channels\\)\\);\")"
+      "Bash(node -e \"const sharp=require\\('sharp'\\);sharp\\('assets/bot-icon.png'\\).metadata\\(\\).then\\(m=>console.log\\('source:',m.width,'×',m.height,'channels:',m.channels\\)\\);\")",
+      "Bash(npm uninstall *)"
     ]
   }
 }

@@ -357,7 +357,7 @@ export function AIAssistantFab() {
                 </button>
               </form>
               <div className="mt-2 text-center text-[10px] uppercase tracking-widest text-text-2">
-                Powered by NexCart Intelligence™ · Claude + pgvector
+                Powered by NexCart Intelligence™ · Groq + pgvector
               </div>
             </div>
           </motion.div>

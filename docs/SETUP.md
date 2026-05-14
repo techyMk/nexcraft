@@ -292,20 +292,35 @@ paste into Supabase **SQL Editor → + New query** → **Run**. This:
 
 ### 10.2 Add your API keys
 
+The chat assistant uses **two free-tier-friendly providers**:
+
+- **Groq** for chat generation — no credit card required, very fast Llama 3.3 70B inference.
+- **OpenAI** for embeddings only — costs < $0.001 for the entire company doc; you'll need a $5 minimum top-up on the account.
+
 In `.env.local` (and the same vars in Vercel for prod):
 
 ```
-ANTHROPIC_API_KEY=sk-ant-...   # https://console.anthropic.com
-OPENAI_API_KEY=sk-proj-...     # https://platform.openai.com — embeddings only
+GROQ_API_KEY=gsk_...           # https://console.groq.com/keys
+OPENAI_API_KEY=sk-proj-...     # https://platform.openai.com/api-keys
 ```
 
 Restart `npm run dev` after editing `.env.local`.
 
+> Why not Groq for embeddings too? Groq doesn't offer embedding models —
+> only LLM inference. OpenAI's `text-embedding-3-small` is the standard
+> pairing and effectively free at this scale.
+
 ### 10.3 Upload your company doc
+
+A ready-made starter doc lives at
+[`assets/nexcart-knowledge.md`](../assets/nexcart-knowledge.md) — it
+covers the company story, products, shipping, returns, warranty,
+payments, accounts, support, sustainability, FAQs, and internal contact
+emails. Edit it to match your reality.
 
 1. Sign in as an admin
 2. Go to **/admin/knowledge**
-3. Pick a PDF, TXT or MD up to 20 MB
+3. Pick a PDF, TXT or MD up to 20 MB (the starter doc is fine to upload as-is)
 4. Click **Upload + index** — wait 5–30 seconds while it parses, chunks,
    and embeds. You should see the status flip to **READY** with a chunk
    count.
@@ -315,9 +330,9 @@ Restart `npm run dev` after editing `.env.local`.
 Click the floating bot icon (bottom-right of any non-admin page). Ask
 something specific to your company doc. The bot will:
 
-1. Embed your question
-2. Find the 6 most relevant chunks from your indexed documents
-3. Ask Claude to answer using only that context
+1. Embed your question (OpenAI)
+2. Find the 6 most relevant chunks from your indexed documents (pgvector)
+3. Ask Groq's Llama 3.3 to answer using only that context
 4. Stream the reply back, with **Source: <document title>** at the end
 
 If you ask something not covered in any document, the bot will politely
@@ -325,10 +340,12 @@ say it doesn't know — it won't hallucinate.
 
 ### 10.5 Costs
 
-- **Embeddings:** $0.02 per 1M tokens. A 50-page handbook ≈ 25k tokens =
-  $0.0005.
-- **Chat:** Claude Sonnet 4.6 is ~$3/1M input + $15/1M output. A typical
-  chat turn with retrieved context is ~$0.01–0.02.
+- **Embeddings:** OpenAI text-embedding-3-small is $0.02 per 1M tokens.
+  The 5k-word starter doc costs ~$0.0001 to embed. Forever.
+- **Chat:** Groq's free tier covers Llama 3.3 70B at 30 requests/minute
+  with 12k tokens/minute. No cost. Hit the limit and the SDK throws a
+  rate-limit error — bump to their paid tier or swap to
+  `llama-3.1-8b-instant` (much higher limits).
 
 ---
 
@@ -344,6 +361,8 @@ like one of these, do the listed fix:
 | `Database missing 'orders' table — run supabase/migrations/002_orders.sql` | Run that migration in Supabase SQL Editor |
 | `Database is missing the knowledge_base tables` | Run `supabase/migrations/006_knowledge_base.sql` |
 | `OPENAI_API_KEY is not set on the server` | Add it to `.env.local` / Vercel and restart/redeploy |
+| `GROQ_API_KEY is not set on the server` | Add it from https://console.groq.com/keys and restart/redeploy |
+| Chat returns `Rate limit reached` | Groq's free tier — wait a minute, or swap `CHAT_MODEL` in `src/lib/ai/groq.ts` to `llama-3.1-8b-instant` |
 | Chat reply says "I don't have details on that" | Either no documents are indexed yet, or the question is outside the docs. Upload more via `/admin/knowledge`. |
 | `Invalid JSON body` | Check the request body — usually a missing `Content-Type: application/json` header |
 | `Sign in to save items` | The wishlist sync route requires an authenticated user |
