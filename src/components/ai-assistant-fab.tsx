@@ -12,6 +12,8 @@ import {
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 type Role = "user" | "assistant";
 type Message = {
@@ -292,10 +294,16 @@ export function AIAssistantFab() {
                         className={
                           m.role === "user"
                             ? "rounded-2xl rounded-br-md bg-gradient-brand px-3 py-2 text-sm text-white"
-                            : "rounded-2xl rounded-bl-md bg-white/[0.04] px-3 py-2 text-sm text-text whitespace-pre-wrap"
+                            : "rounded-2xl rounded-bl-md bg-white/[0.04] px-3 py-2 text-sm text-text"
                         }
                       >
-                        {m.content || (
+                        {m.content ? (
+                          m.role === "assistant" ? (
+                            <ChatMarkdown content={m.content} />
+                          ) : (
+                            <span className="whitespace-pre-wrap">{m.content}</span>
+                          )
+                        ) : (
                           <span className="inline-flex gap-1 align-middle">
                             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400" />
                             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-400 [animation-delay:0.15s]" />
@@ -361,5 +369,89 @@ export function AIAssistantFab() {
         )}
       </AnimatePresence>
     </>
+  );
+}
+
+/**
+ * Renders assistant replies as markdown — bold, lists, links, code, tables.
+ * Tight chat-bubble styling; everything inherits the bubble's text color.
+ */
+function ChatMarkdown({ content }: { content: string }) {
+  return (
+    <div className="text-sm leading-relaxed [&>:first-child]:mt-0 [&>:last-child]:mb-0">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          p: ({ children }) => <p className="my-1.5">{children}</p>,
+          strong: ({ children }) => (
+            <strong className="font-semibold text-white">{children}</strong>
+          ),
+          em: ({ children }) => <em className="italic">{children}</em>,
+          code: ({ children }) => (
+            <code className="rounded bg-white/[0.06] px-1 py-0.5 font-mono text-[12px] text-primary-200 ring-1 ring-white/10">
+              {children}
+            </code>
+          ),
+          pre: ({ children }) => (
+            <pre className="my-2 overflow-x-auto rounded-lg bg-white/[0.04] p-2 font-mono text-[12px] ring-1 ring-white/10">
+              {children}
+            </pre>
+          ),
+          ul: ({ children }) => (
+            <ul className="my-1.5 ml-4 list-disc space-y-1">{children}</ul>
+          ),
+          ol: ({ children }) => (
+            <ol className="my-1.5 ml-4 list-decimal space-y-1">{children}</ol>
+          ),
+          li: ({ children }) => <li className="pl-0.5">{children}</li>,
+          a: ({ children, href }) => (
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary-300 underline underline-offset-2 hover:text-primary-200"
+            >
+              {children}
+            </a>
+          ),
+          h1: ({ children }) => (
+            <div className="mt-2 mb-1 text-base font-semibold text-white">
+              {children}
+            </div>
+          ),
+          h2: ({ children }) => (
+            <div className="mt-2 mb-1 text-sm font-semibold text-white">
+              {children}
+            </div>
+          ),
+          h3: ({ children }) => (
+            <div className="mt-2 mb-1 text-sm font-semibold text-white">
+              {children}
+            </div>
+          ),
+          blockquote: ({ children }) => (
+            <blockquote className="my-1.5 border-l-2 border-white/20 pl-2 text-text-2">
+              {children}
+            </blockquote>
+          ),
+          hr: () => <hr className="my-2 border-white/[0.06]" />,
+          table: ({ children }) => (
+            <div className="my-2 overflow-x-auto">
+              <table className="w-full border-collapse text-[12px]">{children}</table>
+            </div>
+          ),
+          th: ({ children }) => (
+            <th className="border border-white/[0.08] bg-white/[0.04] px-2 py-1 text-left font-medium text-white">
+              {children}
+            </th>
+          ),
+          td: ({ children }) => (
+            <td className="border border-white/[0.06] px-2 py-1">{children}</td>
+          ),
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
   );
 }
