@@ -19,6 +19,24 @@ import { updateProfileAction } from "./actions";
 const MAX_AVATAR_BYTES = 5 * 1024 * 1024;
 const ACCEPT = "image/png,image/jpeg,image/webp,image/gif";
 
+// SVG presets shipped in /public/avatars/.
+const PRESETS = [
+  "ava",
+  "charlotte",
+  "ethan",
+  "isabella",
+  "liam",
+  "logan",
+  "lucas",
+  "mason",
+  "mia",
+  "noah",
+  "olivia",
+  "sophia",
+] as const;
+
+const presetPath = (name: (typeof PRESETS)[number]) => `/avatars/${name}.svg`;
+
 function initials(name: string) {
   return name
     .split(/\s+/)
@@ -295,6 +313,51 @@ export function EditProfileModal({
                     <div className="mt-2 text-[11px] text-text-2">
                       PNG, JPG, WebP, GIF · up to 5 MB
                     </div>
+                  </div>
+                </div>
+
+                {/* Preset avatars */}
+                <div className="space-y-3 pt-1">
+                  <div className="flex items-center gap-3 text-[10px] uppercase tracking-[0.18em] text-text-2">
+                    <span className="h-px flex-1 bg-white/[0.06]" />
+                    Or pick a preset
+                    <span className="h-px flex-1 bg-white/[0.06]" />
+                  </div>
+                  <div className="grid grid-cols-6 gap-2 sm:grid-cols-6">
+                    {PRESETS.map((name) => {
+                      const src = presetPath(name);
+                      const selected = avatarUrl === src;
+                      return (
+                        <button
+                          key={name}
+                          type="button"
+                          onClick={() => setAvatarUrl(src)}
+                          disabled={uploading}
+                          aria-label={`Use ${name} avatar`}
+                          aria-pressed={selected}
+                          title={name[0].toUpperCase() + name.slice(1)}
+                          className={`relative aspect-square overflow-hidden rounded-full bg-white/[0.04] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 ${
+                            selected
+                              ? "ring-2 ring-primary-400 shadow-glow"
+                              : "ring-1 ring-white/10 hover:ring-white/30"
+                          }`}
+                        >
+                          <Image
+                            src={src}
+                            alt={name}
+                            width={64}
+                            height={64}
+                            className="h-full w-full object-cover"
+                            unoptimized
+                          />
+                          {selected && (
+                            <span className="absolute -bottom-0.5 -right-0.5 grid h-4 w-4 place-items-center rounded-full bg-primary-500 ring-2 ring-surface">
+                              <Check size={9} className="text-white" />
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
