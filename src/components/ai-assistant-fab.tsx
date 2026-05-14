@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Sparkles, X, Send } from "lucide-react";
+import { Send, X } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -56,8 +56,14 @@ export function AIAssistantFab() {
             <div className="relative border-b border-white/[0.06] p-5">
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-400/40 to-transparent" />
               <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-brand shadow-glow">
-                  <Sparkles size={18} className="text-white" />
+                <div className="grid h-10 w-10 place-items-center overflow-hidden rounded-xl bg-gradient-brand shadow-glow">
+                  <Image
+                    src="/brand/bot-icon.webp"
+                    alt=""
+                    width={256}
+                    height={256}
+                    className="h-7 w-7 object-contain drop-shadow"
+                  />
                 </div>
                 <div>
                   <div className="font-display text-base font-semibold">
