@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { CHAT_MODEL, groq } from "@/lib/ai/groq";
-import { embed } from "@/lib/ai/openai";
+import { embed } from "@/lib/ai/gemini";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { jsonError } from "@/lib/api";
 import { createClient } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { embedBatch } from "@/lib/ai/openai";
+import { embedBatch } from "@/lib/ai/gemini";
 import { approxTokens, chunk } from "@/lib/ai/chunk";
 import { extractText } from "@/lib/ai/parse";
 

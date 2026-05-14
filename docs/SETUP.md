@@ -273,42 +273,47 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe
 
 ## 10. AI knowledge base (RAG)
 
-The chat bubble at the bottom-right uses Claude for replies and OpenAI
-embeddings + pgvector for retrieval over documents you upload.
+The chat bubble at the bottom-right uses **Groq** (free Llama 3.3 70B
+inference) for replies, **Google Gemini text-embedding-004** for
+embeddings (free, 768 dim, 1500 req/min), and **pgvector** in Supabase
+for similarity search over documents you upload.
 
-### 10.1 Run the migration
+**Both providers are 100% free — no credit card required.**
 
-Open `supabase/migrations/006_knowledge_base.sql` in VS Code → copy →
-paste into Supabase **SQL Editor → + New query** → **Run**. This:
+### 10.1 Run the migrations
 
-- enables the `vector` extension
-- creates `kb_documents` and `kb_chunks(vector(1536))`
-- creates the `match_kb_chunks` similarity-search function
-- enables RLS (admin-only writes)
-- provisions the private `kb` storage bucket with policies
+Paste each file below into Supabase **SQL Editor → + New query** →
+**Run**, in order.
 
-**Verify:** Database → Extensions shows `vector` ✓ · Database → Tables shows
-`kb_documents` + `kb_chunks` · Storage → Buckets shows `kb`.
+| # | File | What it does |
+|---|---|---|
+| 1 | [`supabase/migrations/006_knowledge_base.sql`](../supabase/migrations/006_knowledge_base.sql) | pgvector extension, `kb_documents`, `kb_chunks`, RLS, `kb` storage bucket |
+| 2 | [`supabase/migrations/007_gemini_embeddings.sql`](../supabase/migrations/007_gemini_embeddings.sql) | Resize the embedding column from 1536 → 768 dim for Gemini, rebuild the HNSW index + RPC |
+
+**Verify after step 2:** Database → Tables → `kb_chunks` → Columns →
+`embedding` shows `vector(768)`.
+
+> Already ran 006 before this section existed? Just run 007 — it drops
+> and recreates the column, so any previously uploaded docs need to be
+> re-indexed (the migration flips their status to `failed` so you can
+> re-upload from the admin UI).
 
 ### 10.2 Add your API keys
-
-The chat assistant uses **two free-tier-friendly providers**:
-
-- **Groq** for chat generation — no credit card required, very fast Llama 3.3 70B inference.
-- **OpenAI** for embeddings only — costs < $0.001 for the entire company doc; you'll need a $5 minimum top-up on the account.
 
 In `.env.local` (and the same vars in Vercel for prod):
 
 ```
 GROQ_API_KEY=gsk_...           # https://console.groq.com/keys
-OPENAI_API_KEY=sk-proj-...     # https://platform.openai.com/api-keys
+GEMINI_API_KEY=AIza...         # https://aistudio.google.com/apikey
 ```
+
+Both are free with email signup, no credit card.
 
 Restart `npm run dev` after editing `.env.local`.
 
-> Why not Groq for embeddings too? Groq doesn't offer embedding models —
-> only LLM inference. OpenAI's `text-embedding-3-small` is the standard
-> pairing and effectively free at this scale.
+> Why two providers? Groq is brilliant at LLM inference but doesn't offer
+> embeddings. Gemini's `text-embedding-004` has a generous free tier
+> (1500 req/min) and matches Groq's "no CC" stance.
 
 ### 10.3 Upload your company doc
 
@@ -330,7 +335,7 @@ emails. Edit it to match your reality.
 Click the floating bot icon (bottom-right of any non-admin page). Ask
 something specific to your company doc. The bot will:
 
-1. Embed your question (OpenAI)
+1. Embed your question (Gemini)
 2. Find the 6 most relevant chunks from your indexed documents (pgvector)
 3. Ask Groq's Llama 3.3 to answer using only that context
 4. Stream the reply back, with **Source: <document title>** at the end
@@ -340,12 +345,15 @@ say it doesn't know — it won't hallucinate.
 
 ### 10.5 Costs
 
-- **Embeddings:** OpenAI text-embedding-3-small is $0.02 per 1M tokens.
-  The 5k-word starter doc costs ~$0.0001 to embed. Forever.
-- **Chat:** Groq's free tier covers Llama 3.3 70B at 30 requests/minute
-  with 12k tokens/minute. No cost. Hit the limit and the SDK throws a
-  rate-limit error — bump to their paid tier or swap to
-  `llama-3.1-8b-instant` (much higher limits).
+Both tiers are free.
+
+- **Embeddings (Gemini text-embedding-004):** 1500 requests/min, no daily
+  cap on free tier. Even a 100-page document fits in a single batch
+  request.
+- **Chat (Groq llama-3.3-70b-versatile):** 30 requests/min, 12k tokens/min.
+  Hit the limit and the SDK throws a rate-limit error — swap
+  `CHAT_MODEL` in `src/lib/ai/groq.ts` to `llama-3.1-8b-instant` for
+  much higher limits.
 
 ---
 
@@ -360,8 +368,10 @@ like one of these, do the listed fix:
 | `STRIPE_WEBHOOK_SECRET is not set on the server.` | Same — but use the `whsec_` from Stripe Dashboard, not the CLI |
 | `Database missing 'orders' table — run supabase/migrations/002_orders.sql` | Run that migration in Supabase SQL Editor |
 | `Database is missing the knowledge_base tables` | Run `supabase/migrations/006_knowledge_base.sql` |
-| `OPENAI_API_KEY is not set on the server` | Add it to `.env.local` / Vercel and restart/redeploy |
+| `GEMINI_API_KEY is not set on the server` | Add it from https://aistudio.google.com/apikey and restart/redeploy |
 | `GROQ_API_KEY is not set on the server` | Add it from https://console.groq.com/keys and restart/redeploy |
+| `Gemini ... failed (429): ... quota` | You hit the free-tier rate limit. Wait a minute or paginate uploads |
+| Upload says `vector dimension mismatch` | You ran 006 but not 007 — run `supabase/migrations/007_gemini_embeddings.sql` |
 | Chat returns `Rate limit reached` | Groq's free tier — wait a minute, or swap `CHAT_MODEL` in `src/lib/ai/groq.ts` to `llama-3.1-8b-instant` |
 | Chat reply says "I don't have details on that" | Either no documents are indexed yet, or the question is outside the docs. Upload more via `/admin/knowledge`. |
 | `Invalid JSON body` | Check the request body — usually a missing `Content-Type: application/json` header |
