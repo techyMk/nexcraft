@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Minus, Plus, Trash2, X, ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -90,7 +90,7 @@ export function CartDrawer() {
               {lines.length === 0 ? (
                 <div className="flex h-full flex-col items-center justify-center text-center">
                   <div className="mb-4 grid h-16 w-16 place-items-center rounded-full bg-white/[0.03]">
-                    <Sparkles size={22} className="text-primary-400" />
+                    <ShoppingBag size={22} className="text-primary-400" />
                   </div>
                   <div className="font-display text-lg font-semibold">
                     Your cart is empty

@@ -18,6 +18,7 @@ import {
   Mail,
   ShieldCheck,
   Sparkles,
+  UserPlus,
   Zap,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -462,7 +463,7 @@ export default function RegisterPage() {
                         {loading === "signup" ? (
                           <Loader2 size={14} className="animate-spin" />
                         ) : (
-                          <Sparkles size={14} />
+                          <UserPlus size={14} />
                         )}
                         {loading === "signup"
                           ? "Creating account…"

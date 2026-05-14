@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Sparkles, Globe2, Cpu, Heart, Rocket, Users } from "lucide-react";
+import { Compass, Cpu, Globe2, Heart, Rocket, Users } from "lucide-react";
 
 const stats = [
   { v: "50K+", l: "Happy customers" },
@@ -27,7 +27,7 @@ export default function AboutPage() {
           className="mx-auto max-w-3xl text-center"
         >
           <div className="chip mx-auto">
-            <Sparkles size={12} /> About NexCart
+            <Compass size={12} /> About NexCart
           </div>
           <h1 className="mt-5 font-display text-4xl font-semibold tracking-tight md:text-6xl">
             We&apos;re building the{" "}

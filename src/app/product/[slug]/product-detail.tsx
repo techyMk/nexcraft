@@ -5,15 +5,15 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
+  Check,
   Heart,
-  Truck,
-  ShieldCheck,
-  RotateCcw,
-  Sparkles,
-  Star,
   Minus,
   Plus,
-  Check,
+  RotateCcw,
+  ShieldCheck,
+  ShoppingBag,
+  Star,
+  Truck,
 } from "lucide-react";
 import { type Product } from "@/lib/data";
 import { formatPrice } from "@/lib/utils";
@@ -214,7 +214,7 @@ export function ProductDetail({
                 }}
                 className="btn btn-primary flex-1 min-w-[200px]"
               >
-                <Sparkles size={14} /> Add to cart · {formatPrice(product.price * qty)}
+                <ShoppingBag size={14} /> Add to cart · {formatPrice(product.price * qty)}
               </button>
               <button
                 aria-label="Wishlist"

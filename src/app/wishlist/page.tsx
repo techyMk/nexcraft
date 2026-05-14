@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, ArrowRight, ShoppingBag, Sparkles, Trash2 } from "lucide-react";
+import { ArrowRight, Compass, Heart, ShoppingBag, Trash2 } from "lucide-react";
 import { useWishlist } from "@/store/wishlist";
 import { useCart } from "@/store/cart";
 import { formatPrice } from "@/lib/utils";
@@ -48,7 +48,7 @@ export default function WishlistPage() {
               our AI find your next favourite.
             </p>
             <Link href="/shop" className="btn btn-primary mt-6">
-              <Sparkles size={14} /> Explore the catalog
+              <Compass size={14} /> Explore the catalog
             </Link>
           </div>
         ) : (

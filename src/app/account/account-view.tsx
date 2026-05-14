@@ -13,7 +13,7 @@ import {
   Pencil,
   Settings,
   Shield,
-  Sparkles,
+  Truck,
 } from "lucide-react";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -214,7 +214,7 @@ export function AccountView({
                 </div>
                 {inTransit > 0 && (
                   <span className="chip">
-                    <Sparkles size={12} /> {inTransit} in transit
+                    <Truck size={12} /> {inTransit} in transit
                   </span>
                 )}
               </div>

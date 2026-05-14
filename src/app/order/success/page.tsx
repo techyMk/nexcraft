@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Check, ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Check, Package } from "lucide-react";
 
 export default function OrderSuccessPage() {
   return (
@@ -24,7 +24,7 @@ export default function OrderSuccessPage() {
           receipt and tracking link.
         </p>
         <div className="mt-8 inline-flex items-center gap-3 rounded-full border border-white/[0.06] bg-white/[0.03] px-5 py-2 text-sm">
-          <Sparkles size={14} className="text-primary-300" />
+          <Package size={14} className="text-primary-300" />
           Order #NX-{Math.floor(Math.random() * 99999)}
         </div>
         <div className="mt-10 flex flex-wrap justify-center gap-3">

@@ -5,11 +5,11 @@ import Image from "next/image";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import {
   ArrowRight,
-  Home,
-  Search,
-  Sparkles,
   Compass,
+  Heart,
+  Home,
   LifeBuoy,
+  Search,
 } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { products } from "@/lib/data";
@@ -116,7 +116,7 @@ export default function NotFound() {
               animate={{ opacity: 1, y: 0 }}
               className="chip mx-auto lg:mx-0"
             >
-              <Sparkles size={12} /> Error · transmission lost
+              <Compass size={12} /> Error · transmission lost
             </motion.div>
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
@@ -168,7 +168,7 @@ export default function NotFound() {
               />
               <Shortcut
                 href="/wishlist"
-                Icon={Sparkles}
+                Icon={Heart}
                 title="Open wishlist"
                 hint="Saved for later"
               />

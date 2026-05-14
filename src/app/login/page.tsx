@@ -12,8 +12,8 @@ import {
   Eye,
   EyeOff,
   Loader2,
+  LogIn,
   LogOut,
-  Sparkles,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -344,7 +344,7 @@ function LoginInner() {
                 {loading === "email" ? (
                   <Loader2 size={14} className="animate-spin" />
                 ) : (
-                  <Sparkles size={14} />
+                  <LogIn size={14} />
                 )}
                 {loading === "email" ? "Signing in…" : "Sign in"}
               </button>

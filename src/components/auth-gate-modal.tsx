@@ -7,7 +7,6 @@ import {
   Heart,
   LogIn,
   ShoppingBag,
-  Sparkles,
   UserPlus,
   X,
 } from "lucide-react";
@@ -16,18 +15,18 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { useAuthGate, type AuthIntent } from "@/store/auth-gate";
 
-const intentIcon: Record<AuthIntent, typeof Sparkles> = {
+const intentIcon: Record<AuthIntent, typeof LogIn> = {
   cart: ShoppingBag,
   wishlist: Heart,
   checkout: CreditCard,
-  generic: Sparkles,
+  generic: LogIn,
 };
 
 export function AuthGateModal() {
   const { open, title, description, intent, closeGate } = useAuthGate();
   const pathname = usePathname();
   const next = encodeURIComponent(pathname ?? "/");
-  const Icon = intentIcon[intent] ?? Sparkles;
+  const Icon = intentIcon[intent] ?? LogIn;
 
   // Escape closes
   useEffect(() => {

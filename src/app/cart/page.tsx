@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Minus, Plus, Trash2, Sparkles, ArrowRight } from "lucide-react";
+import { ArrowRight, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { useCart } from "@/store/cart";
 import { formatPrice } from "@/lib/utils";
 import { products } from "@/lib/data";
@@ -29,7 +29,7 @@ export default function CartPage() {
         {lines.length === 0 ? (
           <div className="grid place-items-center rounded-3xl border border-white/[0.06] bg-white/[0.02] p-20 text-center backdrop-blur-xl">
             <div className="grid h-16 w-16 place-items-center rounded-full bg-gradient-brand text-white shadow-glow">
-              <Sparkles size={20} />
+              <ShoppingBag size={20} />
             </div>
             <h2 className="mt-5 font-display text-xl">Your cart is empty</h2>
             <p className="mt-1 text-sm text-text-2">

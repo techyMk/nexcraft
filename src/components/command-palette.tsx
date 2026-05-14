@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight,
   Heart,
+  Home,
   LayoutDashboard,
   LogIn,
   Package,
@@ -22,7 +23,7 @@ import { formatPrice } from "@/lib/utils";
 import { useCommandPalette } from "@/store/command";
 
 const navActions = [
-  { label: "Go to Home", hint: "Landing page", Icon: Sparkles, href: "/" },
+  { label: "Go to Home", hint: "Landing page", Icon: Home, href: "/" },
   { label: "Browse Shop", hint: "All products", Icon: ShoppingBag, href: "/shop" },
   { label: "AI Picks", hint: "Curated by AI", Icon: Sparkles, href: "/shop?ai=1" },
   { label: "Today's Deals", hint: "Limited-time offers", Icon: Package, href: "/shop?sale=1" },

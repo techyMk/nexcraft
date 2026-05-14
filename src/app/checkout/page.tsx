@@ -4,13 +4,14 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
+  Apple,
+  Check,
   CreditCard,
   Lock,
   ShieldCheck,
-  Truck,
-  Check,
+  Smartphone,
   Sparkles,
-  Apple,
+  Truck,
 } from "lucide-react";
 import { useCart } from "@/store/cart";
 import { formatPrice } from "@/lib/utils";
@@ -130,7 +131,7 @@ export default function CheckoutPage() {
                     { id: "card", Icon: CreditCard, label: "Card" },
                     { id: "paypal", Icon: ShieldCheck, label: "PayPal" },
                     { id: "apple", Icon: Apple, label: "Apple Pay" },
-                    { id: "upi", Icon: Sparkles, label: "UPI" },
+                    { id: "upi", Icon: Smartphone, label: "UPI" },
                   ].map((p) => (
                     <button
                       key={p.id}

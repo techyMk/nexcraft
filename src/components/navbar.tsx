@@ -6,14 +6,13 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
+  ArrowRight,
   Heart,
+  Menu,
   Search,
   ShoppingBag,
   User,
-  Menu,
   X,
-  Sparkles,
-  ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/store/cart";
@@ -174,7 +173,7 @@ export function Navbar() {
             href="/shop"
             className="ml-1 hidden h-9 items-center gap-1.5 rounded-full bg-gradient-brand px-4 text-sm font-medium text-white shadow-glow transition hover:brightness-110 md:inline-flex"
           >
-            <Sparkles size={14} />
+            <ShoppingBag size={14} />
             Start Shopping
           </Link>
 
@@ -248,7 +247,7 @@ export function Navbar() {
                 onClick={() => setMenu(false)}
                 className="btn btn-primary mt-3 justify-center"
               >
-                <Sparkles size={14} /> Start Shopping
+                <ShoppingBag size={14} /> Start Shopping
               </Link>
             </div>
           </motion.nav>

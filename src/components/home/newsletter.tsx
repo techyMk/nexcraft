@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { Mail } from "lucide-react";
 
 export function Newsletter() {
   return (
@@ -19,7 +19,7 @@ export function Newsletter() {
           <div className="pointer-events-none absolute -right-32 bottom-0 h-64 w-64 rounded-full bg-accent-purple/40 blur-3xl" />
           <div className="relative mx-auto max-w-2xl">
             <div className="chip mx-auto">
-              <Sparkles size={12} /> Insiders only
+              <Mail size={12} /> Insiders only
             </div>
             <h2 className="mt-4 font-display text-3xl font-semibold leading-tight tracking-tight md:text-5xl">
               Get exclusive AI-picked deals first.
