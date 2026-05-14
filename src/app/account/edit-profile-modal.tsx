@@ -243,12 +243,12 @@ export function EditProfileModal({
                       </span>
                     )}
                     {/* Hover hint — change/upload */}
-                    <span className="absolute inset-0 grid place-items-center bg-bg/60 opacity-0 backdrop-blur-sm transition group-hover:opacity-100">
+                    <span className="absolute inset-0 grid place-items-center rounded-full bg-bg/60 opacity-0 backdrop-blur-sm transition group-hover:opacity-100">
                       <Upload size={16} className="text-white" />
                     </span>
                     {/* Hard loading overlay */}
                     {uploading && (
-                      <span className="absolute inset-0 grid place-items-center bg-bg/70 backdrop-blur-sm">
+                      <span className="absolute inset-0 grid place-items-center rounded-full bg-bg/70 backdrop-blur-sm">
                         <Loader2 size={18} className="animate-spin text-white" />
                       </span>
                     )}
