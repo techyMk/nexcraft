@@ -13,7 +13,7 @@ const avatars = [
 ];
 
 const seed = [
-  ["Alex Vance", "alex@nexcart.app", "Gold", 12, "$4,820"],
+  ["Alex Vance", "techymk.dev@gmail.com", "Gold", 12, "$4,820"],
   ["Marcus Okafor", "marcus@kinetic.io", "Platinum", 28, "$12,140"],
   ["Sara Chen", "sara@vercel.com", "Silver", 6, "$1,990"],
   ["Mei Tanaka", "mei@tokyo.studio", "Gold", 14, "$5,330"],

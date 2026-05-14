@@ -197,7 +197,7 @@ best authorised-retailer price.
 
 - If you find a verifiable lower price on the **same SKU** from an
   **authorised seller** within **14 days of purchase**, email
-  match@nexcart.app with the receipt and link.
+  techymk.dev@gmail.com with the receipt and link.
 - We credit you the difference as store credit (faster) or refund to
   your original payment method (3–5 business days).
 - Marketplace listings, used items, and grey imports do not qualify.
@@ -211,7 +211,7 @@ Volume discounts on orders of 10+ identical units:
 | 10–24 units | 3% |
 | 25–49 units | 5% |
 | 50–99 units | 8% |
-| 100+ units | Custom quote — email business@nexcart.app |
+| 100+ units | Custom quote — email techymk.dev@gmail.com |
 
 Verified businesses can request **Net-30 invoicing** instead of paying
 upfront. Accounts spending $25k+/year get a dedicated account manager.
@@ -386,7 +386,7 @@ The warranty does **not** cover:
 - Software-only issues unrelated to hardware
 
 To claim: **Account → Orders → [order number] → Open a warranty claim**, or
-email warranty@nexcart.app. We aim to triage within 24 hours and ship a
+email techymk.dev@gmail.com. We aim to triage within 24 hours and ship a
 replacement or repair within 5–7 business days.
 
 For accidental damage, **NexCart Protect+** is an optional add-on at
@@ -464,7 +464,7 @@ email when a wishlisted item drops in price or comes back in stock.
 - **AI Assistant** (NexCart Intelligence™) — bottom-right of every page,
   24/7. Median first response: 38 seconds. Hand-off to a human at any
   time by typing "talk to a human".
-- **Email** — support@nexcart.app — replied to within 4 business hours
+- **Email** — techymk.dev@gmail.com — replied to within 4 business hours
   (faster for Gold and Platinum members).
 - **Phone** — listed under Help Center → Contact for each supported
   country. Hours vary by region.
@@ -497,7 +497,7 @@ NexCart sells to businesses, schools, and creator studios. We offer:
 - Dedicated account manager for accounts spending $25k+ per year
 - White-label gift cards for employee rewards
 
-Email **business@nexcart.app** with your purchase ask and we'll respond
+Email **techymk.dev@gmail.com** with your purchase ask and we'll respond
 within 1 business day.
 
 ---
@@ -548,7 +548,7 @@ both the old and the new address to confirm.
 **Do you price-match?**
 We monitor competitor pricing daily and aim to be within 1% of the best
 authorised-retailer price. If you find a verifiable lower price on the
-same SKU from an authorised seller, email match@nexcart.app within 14
+same SKU from an authorised seller, email techymk.dev@gmail.com within 14
 days of purchase and we'll credit you the difference.
 
 **How do AI Picks work?**
@@ -570,7 +570,7 @@ Yes — denominations from $25 to $500, delivered by email. Available under
 **How do I become a NexCart admin or seller?**
 We don't have a marketplace, so there's no public seller programme.
 For brand partnership and supply enquiries, email
-partnerships@nexcart.app.
+techymk.dev@gmail.com.
 
 **What payment data does NexCart store?**
 None of your card numbers. Stripe stores a token we can charge with your
@@ -590,14 +590,14 @@ so the assistant can suggest the correct one.
 
 | Topic | Email |
 |---|---|
-| General support | support@nexcart.app |
-| Warranty claims | warranty@nexcart.app |
-| Returns | returns@nexcart.app |
-| Business / bulk | business@nexcart.app |
-| Press | press@nexcart.app |
-| Partnerships | partnerships@nexcart.app |
-| Privacy / data requests | privacy@nexcart.app |
-| Security disclosure | security@nexcart.app |
+| General support | techymk.dev@gmail.com |
+| Warranty claims | techymk.dev@gmail.com |
+| Returns | techymk.dev@gmail.com |
+| Business / bulk | techymk.dev@gmail.com |
+| Press | techymk.dev@gmail.com |
+| Partnerships | techymk.dev@gmail.com |
+| Privacy / data requests | techymk.dev@gmail.com |
+| Security disclosure | techymk.dev@gmail.com |
 
 ---
 

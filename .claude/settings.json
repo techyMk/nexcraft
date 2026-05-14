@@ -21,7 +21,9 @@
       "Bash(powershell.exe -NoProfile -Command \"Get-Process node -ErrorAction SilentlyContinue | Select-Object Id, ProcessName, StartTime | Format-Table -AutoSize\")",
       "Bash(node -e \"const sharp=require\\('sharp'\\);sharp\\('assets/bot-icon.png'\\).metadata\\(\\).then\\(m=>console.log\\('src:',m.width,'x',m.height,'channels:',m.channels\\)\\);sharp\\('public/brand/bot-icon.webp'\\).metadata\\(\\).then\\(m=>console.log\\('out:',m.width,'x',m.height\\)\\);\")",
       "Bash(node -e \"const sharp=require\\('sharp'\\);sharp\\('assets/bot-icon.png'\\).metadata\\(\\).then\\(m=>console.log\\('source:',m.width,'×',m.height,'channels:',m.channels\\)\\);\")",
-      "Bash(npm uninstall *)"
+      "Bash(npm uninstall *)",
+      "Bash(sed -i 's/[a-z]*@nexcart\\\\.app/techymk.dev@gmail.com/g' assets/nexcart-knowledge.md src/app/admin/customers/page.tsx)",
+      "Bash(sed -i 's|orders@yourdomain\\\\.com|techymk.dev@gmail.com|g' .env.example docs/SETUP.md)"
     ]
   }
 }

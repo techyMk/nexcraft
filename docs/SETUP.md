@@ -258,7 +258,7 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe
 
 1. https://resend.com → create API key → `RESEND_API_KEY` in Vercel
 2. Verify your sending domain
-3. `RESEND_FROM="NexCart <orders@yourdomain.com>"`
+3. `RESEND_FROM="NexCart <techymk.dev@gmail.com>"`
 4. Trigger from the Stripe webhook on `checkout.session.completed`
    (see [INTEGRATION.md](INTEGRATION.md) §6 — Cart & checkout)
 
