@@ -18,6 +18,8 @@ import { cn } from "@/lib/utils";
 import { useCart } from "@/store/cart";
 import { useWishlist } from "@/store/wishlist";
 import { useCommandPalette } from "@/store/command";
+import { useAuth } from "@/components/auth-provider";
+import { createClient } from "@/lib/supabase/client";
 
 const links = [
   { href: "/", label: "Home" },
@@ -29,12 +31,68 @@ const links = [
 
 export function Navbar() {
   const pathname = usePathname();
+  const { user } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [menu, setMenu] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [fullName, setFullName] = useState<string | null>(null);
   const openCart = useCart((s) => s.openCart);
   const count = useCart((s) => s.lines.reduce((a, l) => a + l.quantity, 0));
   const wishCount = useWishlist((s) => s.items.length);
   const openPalette = useCommandPalette((s) => s.openPalette);
+
+  useEffect(() => {
+    if (!user) {
+      setAvatarUrl(null);
+      setFullName(null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from("profiles")
+          .select("full_name, avatar_url")
+          .eq("id", user.id)
+          .maybeSingle();
+        if (cancelled) return;
+        setAvatarUrl(
+          data?.avatar_url ??
+            (user.user_metadata?.avatar_url as string | undefined) ??
+            null,
+        );
+        setFullName(
+          data?.full_name ??
+            (user.user_metadata?.full_name as string | undefined) ??
+            user.email ??
+            null,
+        );
+      } catch {
+        if (!cancelled) {
+          setAvatarUrl(
+            (user.user_metadata?.avatar_url as string | undefined) ?? null,
+          );
+          setFullName(
+            (user.user_metadata?.full_name as string | undefined) ??
+              user.email ??
+              null,
+          );
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
+  const initials = (fullName ?? user?.email ?? "")
+    .split(/[\s@._-]+/)
+    .filter(Boolean)
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -145,14 +203,39 @@ export function Navbar() {
           </Link>
 
           {/* Account — visible on ALL screens. Goes to /account; middleware
-              bounces unauthenticated users to /login. */}
-          <Link
-            href="/account"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-text-2 hover:bg-white/[0.05] hover:text-white"
-            aria-label="Account"
-          >
-            <User size={18} />
-          </Link>
+              bounces unauthenticated users to /login. Shows avatar/initials
+              when signed in so the auth state is visually obvious. */}
+          {user ? (
+            <Link
+              href="/account"
+              aria-label={fullName ? `${fullName}'s account` : "Account"}
+              title={fullName ?? user.email ?? "Account"}
+              className="relative inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-gradient-brand text-[11px] font-semibold text-white ring-1 ring-white/15 transition hover:ring-white/30"
+            >
+              {avatarUrl ? (
+                <Image
+                  src={avatarUrl}
+                  alt=""
+                  width={36}
+                  height={36}
+                  unoptimized
+                  referrerPolicy="no-referrer"
+                  className="h-full w-full rounded-full object-cover"
+                />
+              ) : (
+                <span>{initials || "·"}</span>
+              )}
+              <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 ring-2 ring-bg" />
+            </Link>
+          ) : (
+            <Link
+              href="/account"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-text-2 hover:bg-white/[0.05] hover:text-white"
+              aria-label="Account"
+            >
+              <User size={18} />
+            </Link>
+          )}
 
           {/* Cart — visible on all screens */}
           <button
@@ -168,13 +251,17 @@ export function Navbar() {
             )}
           </button>
 
-          {/* Start Shopping CTA — desktop only */}
+          {/* Start Shopping CTA — desktop only. Uses ArrowRight to stay
+              visually distinct from the cart icon next to it. */}
           <Link
             href="/shop"
-            className="ml-1 hidden h-9 items-center gap-1.5 rounded-full bg-gradient-brand px-4 text-sm font-medium text-white shadow-glow transition hover:brightness-110 md:inline-flex"
+            className="group ml-1 hidden h-9 items-center gap-1.5 rounded-full bg-gradient-brand px-4 text-sm font-medium text-white shadow-glow transition hover:brightness-110 md:inline-flex"
           >
-            <ShoppingBag size={14} />
             Start Shopping
+            <ArrowRight
+              size={14}
+              className="transition-transform group-hover:translate-x-0.5"
+            />
           </Link>
 
           {/* Hamburger — mobile only */}
@@ -225,7 +312,33 @@ export function Navbar() {
                 onClick={() => setMenu(false)}
                 className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-text-2 transition hover:bg-white/[0.04] hover:text-white"
               >
-                <User size={15} /> Account
+                {user ? (
+                  <>
+                    <span className="relative inline-flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-brand text-[10px] font-semibold text-white ring-1 ring-white/15">
+                      {avatarUrl ? (
+                        <Image
+                          src={avatarUrl}
+                          alt=""
+                          width={24}
+                          height={24}
+                          unoptimized
+                          referrerPolicy="no-referrer"
+                          className="h-full w-full rounded-full object-cover"
+                        />
+                      ) : (
+                        <span>{initials || "·"}</span>
+                      )}
+                      <span className="absolute -bottom-0.5 -right-0.5 h-1.5 w-1.5 rounded-full bg-emerald-400 ring-2 ring-bg" />
+                    </span>
+                    <span className="truncate text-white">
+                      {fullName ?? user.email}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <User size={15} /> Sign in
+                  </>
+                )}
                 <ArrowRight size={13} className="ml-auto text-text-2/70" />
               </Link>
               <Link
@@ -247,7 +360,7 @@ export function Navbar() {
                 onClick={() => setMenu(false)}
                 className="btn btn-primary mt-3 justify-center"
               >
-                <ShoppingBag size={14} /> Start Shopping
+                Start Shopping <ArrowRight size={14} />
               </Link>
             </div>
           </motion.nav>
