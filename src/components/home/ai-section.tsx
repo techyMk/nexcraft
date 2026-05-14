@@ -1,13 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import {
   Brain,
-  Sparkles,
-  Wand2,
-  TrendingUp,
-  MessagesSquare,
   Compass,
+  MessagesSquare,
+  TrendingUp,
+  Wand2,
 } from "lucide-react";
 
 const cards = [
@@ -95,8 +95,14 @@ function AIChatPreview() {
     >
       <div className="mb-4 flex items-center justify-between border-b border-white/[0.06] pb-3">
         <div className="flex items-center gap-2">
-          <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-brand">
-            <Sparkles size={14} className="text-white" />
+          <div className="grid h-8 w-8 place-items-center overflow-hidden rounded-lg bg-gradient-brand">
+            <Image
+              src="/brand/bot-icon.webp"
+              alt=""
+              width={256}
+              height={256}
+              className="h-6 w-6 object-contain drop-shadow"
+            />
           </div>
           <div>
             <div className="text-sm font-semibold">NexCart Assistant</div>
