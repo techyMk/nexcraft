@@ -108,7 +108,7 @@ export function AccountView({
   const isAdmin = role === "admin" || role === "super_admin";
 
   return (
-    <div className="pt-32">
+    <div className="pt-24 md:pt-32">
       <div className="container">
         <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
           <div>

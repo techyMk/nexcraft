@@ -145,7 +145,7 @@ body::-webkit-scrollbar {
   }
 
   .section {
-    @apply py-20 md:py-28 relative;
+    @apply py-14 sm:py-20 md:py-28 relative;
   }
 
   .section-title {

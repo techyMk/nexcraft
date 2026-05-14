@@ -6,7 +6,7 @@ import { Check, ArrowRight, Sparkles } from "lucide-react";
 
 export default function OrderSuccessPage() {
   return (
-    <div className="grid place-items-center pt-32">
+    <div className="grid place-items-center pt-24 md:pt-32">
       <div className="container max-w-2xl text-center">
         <motion.div
           initial={{ scale: 0, opacity: 0 }}

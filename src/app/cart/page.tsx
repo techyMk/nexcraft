@@ -17,7 +17,7 @@ export default function CartPage() {
   const recs = products.filter((p) => p.badge === "AI PICK").slice(0, 4);
 
   return (
-    <div className="pt-32">
+    <div className="pt-24 md:pt-32">
       <div className="container">
         <div className="mb-10">
           <div className="section-eyebrow">Your bag</div>

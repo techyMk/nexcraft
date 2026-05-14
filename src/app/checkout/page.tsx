@@ -27,7 +27,7 @@ export default function CheckoutPage() {
   const total = subtotal + shipping + tax;
 
   return (
-    <div className="pt-32">
+    <div className="pt-24 md:pt-32">
       <div className="container">
         <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
           <div>

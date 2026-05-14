@@ -69,7 +69,7 @@ export default function NotFound() {
 
   return (
     <div
-      className="relative grid min-h-[calc(100vh-6rem)] place-items-center overflow-hidden pt-32"
+      className="relative grid min-h-[calc(100vh-6rem)] place-items-center overflow-hidden pt-24 md:pt-32"
       style={{ perspective: 1200 }}
     >
       {/* particle field */}

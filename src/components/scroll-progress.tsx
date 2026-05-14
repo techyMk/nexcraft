@@ -26,7 +26,7 @@ export function ScrollProgress() {
         opacity,
         transformOrigin: "0% 50%",
       }}
-      className="pointer-events-none fixed inset-x-0 top-[6rem] z-40 h-[2px] bg-gradient-brand will-change-transform"
+      className="pointer-events-none fixed inset-x-0 top-16 z-40 h-[2px] bg-gradient-brand will-change-transform md:top-24"
     />
   );
 }

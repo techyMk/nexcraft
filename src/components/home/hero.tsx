@@ -7,7 +7,7 @@ import { ArrowRight, Sparkles, Star, ShieldCheck, Truck } from "lucide-react";
 
 export function Hero() {
   return (
-    <section className="relative pt-32 md:pt-40">
+    <section className="relative pt-24 md:pt-40">
       <div className="container relative">
         <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_1fr]">
           <div>

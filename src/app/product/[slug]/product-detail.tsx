@@ -34,7 +34,7 @@ export function ProductDetail({
   const add = useCart((s) => s.add);
 
   return (
-    <div className="pt-28">
+    <div className="pt-24 md:pt-28">
       <div className="container">
         <nav className="mb-6 flex items-center gap-2 text-xs text-text-2">
           <Link href="/" className="hover:text-white">Home</Link>

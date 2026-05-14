@@ -50,7 +50,7 @@ export default function ShopPage() {
   }, [q, cat, sort, price, aiOnly]);
 
   return (
-    <div className="pt-32">
+    <div className="pt-24 md:pt-32">
       <div className="container">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>

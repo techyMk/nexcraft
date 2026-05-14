@@ -19,7 +19,7 @@ const values = [
 
 export default function AboutPage() {
   return (
-    <div className="pt-32">
+    <div className="pt-24 md:pt-32">
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
