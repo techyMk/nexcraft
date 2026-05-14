@@ -51,24 +51,26 @@ export function AuthGateModal() {
   return (
     <AnimatePresence>
       {open && (
-        <>
-          <motion.div
+        <div className="fixed inset-0 z-[80]">
+          <motion.button
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={closeGate}
-            className="fixed inset-0 z-[80] bg-bg/70 backdrop-blur-md"
+            aria-label="Close"
+            className="absolute inset-0 cursor-default bg-bg/70 backdrop-blur-md"
           />
-          <motion.div
-            initial={{ opacity: 0, y: 16, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 16, scale: 0.96 }}
-            transition={{ type: "spring", stiffness: 360, damping: 30 }}
-            className="fixed left-1/2 top-1/2 z-[90] w-[92vw] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-3xl border border-white/[0.08] bg-surface/95 shadow-card backdrop-blur-2xl"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="auth-gate-title"
-          >
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0, y: 16, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 16, scale: 0.96 }}
+              transition={{ type: "spring", stiffness: 360, damping: 30 }}
+              className="pointer-events-auto relative w-full max-w-md overflow-hidden rounded-3xl border border-white/[0.08] bg-surface/95 shadow-card backdrop-blur-2xl"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="auth-gate-title"
+            >
             <div className="relative px-7 py-8 text-center">
               <div className="pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full bg-primary-500/25 blur-3xl" />
               <div className="pointer-events-none absolute -bottom-12 -left-12 h-44 w-44 rounded-full bg-accent-purple/25 blur-3xl" />
@@ -117,8 +119,9 @@ export function AuthGateModal() {
                 Continue browsing
               </button>
             </div>
-          </motion.div>
-        </>
+            </motion.div>
+          </div>
+        </div>
       )}
     </AnimatePresence>
   );
